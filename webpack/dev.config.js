@@ -1,30 +1,14 @@
 const path = require('path');
+const merge = require('webpack-merge');
 
-module.exports = {
-  entry: './src/index.js',
-  output: {
-    filename: 'client.js',
-    path: path.resolve(__dirname, 'static/dist')
-  },
-  module: {
-    rules: [
-      {
-        test: /\.(js|jsx)$/,
-        exclude: /(node_modules\/)/,
-        use: [
-          {
-            loader: 'babel-loader',
-          }
-        ]
-      },
-      {
-        test: /\.less$/,
-        use: [
-          'style-loader',
-          'css-loader',
-          'less-loader'
-        ]
-      }
-    ],
-  },
-}
+const common = require('./common.config.js');
+
+const rootPath = path.resolve(__dirname, '..');
+
+module.exports = merge(common, {
+  mode: 'development', // 'development' or 'production'
+  devtool: 'inline-source-map',
+  devServer: {
+    contentBase: path.resolve(rootPath, 'static/dist'),
+  }
+});
