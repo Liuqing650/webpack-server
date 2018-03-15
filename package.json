@@ -1,6 +1,6 @@
 {
   "name": "webpack-server",
-  "version": "1.0.0",
+  "version": "0.0.2",
   "description": "webpack服务端项目",
   "main": "index.js",
   "scripts": {
