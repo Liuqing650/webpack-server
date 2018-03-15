@@ -1,6 +1,16 @@
 
 > The latest CHANGELOG is written in https://github.com/Liuqing650/webpack-server/releases .
 
+## `0.0.3`
+- 新增 `file-loader` 解析字体
+- `webpack/common.config.js` 下新增字体解析配置
+- `webpack/common.config.js` 下新增模块解析
+  ```
+    alias: {
+      components: path.resolve(rootPath, 'src/components/'),
+      helpers: path.resolve(rootPath, 'src/helpers/')
+    }
+  ```
 ## `0.0.2`
 
 - 增加 **CHANGELOG** 日志

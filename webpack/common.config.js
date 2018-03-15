@@ -17,9 +17,16 @@ module.exports = {
     new CleanWebpackPlugin(['../static/dist']),
     new HtmlWebpackPlugin({
       title: 'webpack-server',
-      template: srcPath + '/helpers/index.html'
+      template: 'src/helpers/index.html'
     })
   ],
+  resolve: {
+    alias: {
+      components: path.resolve(rootPath, 'src/components/'),
+      helpers: path.resolve(rootPath, 'src/helpers/'),
+      vendors: path.resolve(rootPath, 'src/vendors/')
+    }
+  },
   module: {
     rules: [
       {
@@ -68,6 +75,10 @@ module.exports = {
             }
           }
         ]
+      },
+      {
+        test: /\.(woff|woff2|eot|ttf|otf)$/,
+        use: ['file-loader']
       }
     ],
   },

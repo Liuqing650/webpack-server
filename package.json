@@ -1,11 +1,11 @@
 {
   "name": "webpack-server",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "webpack服务端项目",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "webpack-dev-server --config webpack/dev.config.js --open",
+    "dev": "webpack-dev-server --config webpack/dev.config.js",
     "build": "webpack --config webpack/prod.config.js --progress --color --profile"
   },
   "author": "liuqing",
@@ -23,6 +23,7 @@
     "babel-preset-stage-0": "^6.24.1",
     "clean-webpack-plugin": "^0.1.19",
     "css-loader": "^0.28.10",
+    "file-loader": "^1.1.11",
     "html-webpack-plugin": "^3.0.6",
     "less": "^2.3.1",
     "less-loader": "^3.0.0",
