@@ -5,14 +5,17 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "dev",
-    "build": "webpack --config build/webpack.config.js --progress --color --profile"
+    "dev": "webpack --config webpack/dev.config.js",
+    "build": "webpack --config webpack/prod.config.js --progress --color --profile"
   },
   "author": "liuqing",
   "license": "ISC",
   "dependencies": {
     "react": "^16.2.0",
-    "react-dom": "^16.2.0",
+    "react-dom": "^16.2.0"
+  },
+  "devDependencies": {
+    "webpack-dev-server": "^3.1.1",
     "webpack": "^4.1.1"
   }
 }
