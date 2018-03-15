@@ -8,6 +8,11 @@
     "dev": "webpack-dev-server --config webpack/dev.config.js",
     "build": "webpack --config webpack/prod.config.js --progress --color --profile"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Liuqing650/webpack-server"
+  },
+  "homepage": "https://github.com/Liuqing650/webpack-server",
   "author": "liuqing",
   "license": "ISC",
   "dependencies": {
