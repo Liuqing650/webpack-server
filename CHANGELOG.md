@@ -1,7 +1,14 @@
 
 > The latest CHANGELOG is written in https://github.com/Liuqing650/webpack-server/releases .
 
+## `0.0.4`
+- 添加 `babel` ES7支持插件: `babel-plugin-transform-decorators-legacy`
+- 添加 `babel` 复用模块插件: `babel-plugin-transform-runtime`
+- 添加 `mobx`, `mobx-react`, `react-router`
+- 新增 `mobx`, `react-router` 环境, `mobx` 基础框架构建告一段落.
+
 ## `0.0.3`
+
 - 新增 `file-loader` 解析字体
 - `webpack/common.config.js` 下新增字体解析配置
 - `webpack/common.config.js` 下新增模块解析

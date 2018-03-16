@@ -8,7 +8,7 @@ const srcPath = path.resolve(rootPath, 'src');
 
 module.exports = {
   context: rootPath,
-  entry: path.resolve(srcPath, 'index.js'),
+  entry: path.resolve(srcPath, 'client.js'),
   output: {
     filename: 'client.js',
     path: path.resolve(rootPath, 'static/dist')
@@ -24,7 +24,9 @@ module.exports = {
     alias: {
       components: path.resolve(rootPath, 'src/components/'),
       helpers: path.resolve(rootPath, 'src/helpers/'),
-      vendors: path.resolve(rootPath, 'src/vendors/')
+      vendors: path.resolve(rootPath, 'src/vendors/'),
+      containers: path.resolve(rootPath, 'src/containers/'),
+      stores: path.resolve(rootPath, 'src/stores/')
     }
   },
   module: {
