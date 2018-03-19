@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
@@ -8,7 +9,7 @@ const srcPath = path.resolve(rootPath, 'src');
 
 module.exports = {
   context: rootPath,
-  entry: path.resolve(srcPath, 'client.js'),
+  entry: ['webpack-hot-middleware/client?noInfo=true&reload=true', path.resolve(srcPath, 'client.js')],
   output: {
     filename: 'client.js',
     path: path.resolve(rootPath, 'static/dist')
@@ -18,7 +19,8 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: 'webpack-server',
       template: 'src/helpers/index.html'
-    })
+    }),
+    new webpack.HotModuleReplacementPlugin()
   ],
   resolve: {
     alias: {

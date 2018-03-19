@@ -5,7 +5,7 @@ import styles from './index.less';
 
 @inject('clientStore', 'routing')
 @observer
-export default class HomePage extends Component {
+export default class NextPage extends Component {
   static proptypes = {
     clientStore: PropTypes.object,
     routing: PropTypes.object,
@@ -14,17 +14,17 @@ export default class HomePage extends Component {
   getInfo = () => {
     this.props.clientStore.getInfo();
   };
-  changePage = () => {
-    this.props.routing.push('/new');
+  goBack = () => {
+    this.props.routing.push('/');
   }
   render() {
     const { clientStore } = this.props;
     return (
       <div className={styles.wrap}>
-        <h2>New Page</h2>
+        <h2>Next Page</h2>
         <h4>{clientStore.title}: {clientStore.info}</h4>
         <button onClick={this.getInfo}>获取Store信息</button>
-        <button onClick={this.changePage}>跳转</button>
+        <button onClick={this.goBack}>返回</button>
       </div>
     );
   }
