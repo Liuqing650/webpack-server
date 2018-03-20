@@ -9,12 +9,16 @@ const config = require('./dev.config.js');
 const app = express();
 const compiler = webpack(config);
 
-const port = 3000;
+const host = 'localhost';
+const port = 3001;
 const DIST_DIR = config.output.path;
 
 const devMiddleware = webpackDevMiddleware(compiler, {
-  path: DIST_DIR,
-  quiet: true //向控制台显示信息
+  contentBase: 'http://' + host + ':' + port,
+  quiet: true, //向控制台显示信息
+  publicPath: config.output.publicPath,
+  headers: {'Access-Control-Allow-Origin': '*'},
+  stats: {colors: true},
 });
 
 const hotMiddleware = webpackHotMiddleware(compiler, {
@@ -24,18 +28,18 @@ app.use(devMiddleware)
 
 app.use(hotMiddleware);
 
-app.get("*", (req, res, next) =>{
-  const filename = path.join(DIST_DIR, 'index.html');
+// app.get("*", (req, res, next) =>{
+//   const filename = path.join(DIST_DIR, 'index.html');
 
-  compiler.outputFileSystem.readFile(filename, (err, result) =>{
-    if(err){
-      return(next(err))
-    }
-    res.set('content-type', 'text/html')
-    res.send(result)
-    res.end()
-  })
-})
+//   compiler.outputFileSystem.readFile(filename, (err, result) =>{
+//     if(err){
+//       return(next(err))
+//     }
+//     res.set('content-type', 'text/html')
+//     res.send(result)
+//     res.end()
+//   })
+// })
 
 app.listen(port, function (err) {
   if (err) {

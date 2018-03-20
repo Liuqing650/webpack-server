@@ -5,12 +5,23 @@
 - 浅实现服务端渲染
 - 分离 `@0.0.4` 版本到 `mobx` 分支, 后续接着 `mobx` 搭建非服务端项目
 - 添加错误捕获模块 `react-transform-catch-errors`, 错误信息可以直接展示到浏览器端
+- 添加路径映射插件 `webpack-isomorphic-tools`
+- 添加 `extract-text-webpack-plugin`, 版本为 `@4.0.0-beta.0`, 用以支持 `webpack-isomorphic-tools`
+- 卸载了 `webpack-dev-server`, `npm run dev` 暂时无效, 用于实现服务端渲染
+- 添加热加载插件 `webpack-dev-middleware`, `webpack-hot-middleware`
+- 添加 `html-webpack-plugin`, 版本为 `@webpack-contrib/html-webpack-plugin` 用以支持 `webpack 4`
+- 修改 `package.json` 启动配置, 需要运行环境支持 `pm2`
 
 **环境支持**
 - 可能需要 `react-tools` 为 `@0.13.3` 或更高版本
-  > 最新版本查看: `npm view react-tools version`
-  > 升级|安装: `npm install react-tools -g`
+  最新版本查看: `npm view react-tools version`
+  升级|安装: `npm install react-tools -g`
 
+- 可能需要安装 `supervisor` 用于启动 `node` 服务
+  安装: `npm install -g supervisor`
+
+- 可能需要安装 `pm2` 用于管理 `node` 服务进程
+  安装: `npm install -g pm2`
 ## `0.0.4`
 - 添加 `babel` ES7支持插件: `babel-plugin-transform-decorators-legacy`
 - 添加 `babel` 复用模块插件: `babel-plugin-transform-runtime`
