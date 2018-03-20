@@ -83,7 +83,7 @@ module.exports = {
     new webpack.HotModuleReplacementPlugin(),
     new webpack.IgnorePlugin(/webpack-stats\.json$/),
     new ExtractTextPlugin('[name]-[chunkhash].css', { allChunks: true }),
-    new webpack.optimize.CommonsChunkPlugin('common.js'),
+    new webpack.optimize.CommonsChunkPlugin('common'),
     // new HtmlWebpackPlugin({
     //   title: 'webpack-server',
     //   template: 'src/helpers/index.html'
