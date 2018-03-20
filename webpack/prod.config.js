@@ -12,19 +12,22 @@ const rootPath = path.resolve(__dirname, '..');
 const assetsPath = path.resolve(rootPath, './static/dist');
 
 module.exports = merge(common, {
-  mode: 'production', // 'development' or 'production'
+  // mode: 'production', // 'development' or 'production' 4.0.0
   entry: {
     'main': [path.resolve(rootPath, 'src/client.js')]
   },
   output: {
     path: path.resolve(rootPath, 'static/dist'),
     filename: '[name]-[hash].js',
-    chunkFilename: '[name]-[chunkhash].js',
+    chunkFilename: '[name]-[hash].js',
     publicPath: '/dist/'
   },
   plugins: [
     new CleanWebpackPlugin([assetsPath], { root: rootPath }),
     new UglifyJSPlugin({
+      uglifyOptions: {
+        warnings: false
+      },
       sourceMap: false
     })
   ]

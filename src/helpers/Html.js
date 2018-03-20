@@ -37,7 +37,8 @@ export default class Html extends Component {
     return (
       <html lang="en-us">
         <head>
-          <title>webpack-server</title>
+          <link rel="shortcut icon" href="/favicon.ico" />
+          <title>webpack-server-123</title>
           {
             Object.keys(assets.styles).map((style, key) =>
               <link href={assets.styles[style]} key={key}

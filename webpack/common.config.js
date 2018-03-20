@@ -1,7 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+// const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 const WebpackIsomorphicToolsPlugin = require('webpack-isomorphic-tools/plugin');
@@ -26,13 +26,13 @@ module.exports = {
       test: /\.(js|jsx)$/,
       exclude: /(node_modules\/)/,
       use: [{
-          loader: 'babel-loader'
+        loader: 'babel-loader',
         }]
     }, {
       test: /\.css$/,
       use: ExtractTextPlugin.extract(['style-loader', 'css-loader'])
     }, {
-      test: /\.less$/i,
+      test: /\.less$/,
       use: ExtractTextPlugin.extract([{
         loader: 'css-loader',
         options: {
@@ -55,20 +55,43 @@ module.exports = {
       }]
     }],
   },
+  // optimization: {
+    // runtimeChunk: false,
+    // splitChunks: {
+      // chunks: 'all'
+      // minSize: 30000,
+      // minChunks: 3,
+      // maxAsyncRequests: 5,
+      // maxInitialRequests: 3,
+      // name: true,
+      // cacheGroups: {
+      //   commons: {
+      //     name: 'commons',
+      //     chunks: 'all',
+      //     minChunks: 3,
+      //     enforce: true
+      //   },
+      //   vendors: {
+      //     test: /[\\/]node_modules[\\/]/,
+      //     priority: -10
+      //   }
+      // }
+    // }
+  // },
   plugins: [
     webpackIsomorphicToolsPlugin,
     new webpack.HotModuleReplacementPlugin(),
     new webpack.IgnorePlugin(/webpack-stats\.json$/),
     new ExtractTextPlugin('[name]-[chunkhash].css', { allChunks: true }),
-    new HtmlWebpackPlugin({
-      title: 'webpack-server',
-      template: 'src/helpers/index.html'
-    }),
+    new webpack.optimize.CommonsChunkPlugin('common.js'),
+    // new HtmlWebpackPlugin({
+    //   title: 'webpack-server',
+    //   template: 'src/helpers/index.html'
+    // }),
     new webpack.DefinePlugin({
       __CLIENT__: true,
       __SERVER__: false,
-      __DEVELOPMENT__: true,
-      __DEVTOOLS__: true  // <-------- 禁用 redux-devtools
+      __DEVELOPMENT__: true
     })
   ],
 }

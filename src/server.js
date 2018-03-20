@@ -3,18 +3,21 @@ import path from 'path';
 import React from 'react';
 import ReactDOM from 'react-dom/server';
 import config from './config';
+import favicon from 'serve-favicon';
 import fs from 'fs';
 import http from 'http';
 import Html from './helpers/Html';
 import { match, RouterContext } from 'react-router';
-import { Provider } from 'mobx-react';
+import { Provider, useStaticRendering } from 'mobx-react';
 import getRoutes from './routes';
 import { RouterStore } from 'mobx-react-router';
 import * as allStores from 'stores';
-
+useStaticRendering(true);
 const app = new Express();
 const server = new http.Server(app);
 
+app.use(favicon(path.join(__dirname, '..', 'static', 'favicon.ico')));
+app.use(Express.static(path.join(__dirname, '..', 'static')));
 app.use((req, resp) => {
   if (__DEVELOPMENT__) {
     webpackIsomorphicToolsPlugin.refresh();
@@ -47,8 +50,8 @@ if (config.port) {
     if (err) {
       console.error(err);
     }
-    console.info('==>     Open http://%s:%s in a browser to view the app.', config.host, config.port);
+    console.info('==>     [success]: Open http://%s:%s in a browser to view the app.', config.host, config.port);
   });
 } else {
-  console.error('==>     ERROR: No PORT environment variable has been specified');
+  console.error('==>     [error]: No PORT environment variable has been specified');
 }

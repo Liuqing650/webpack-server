@@ -11,6 +11,7 @@
 - 添加热加载插件 `webpack-dev-middleware`, `webpack-hot-middleware`
 - 添加 `html-webpack-plugin`, 版本为 `@webpack-contrib/html-webpack-plugin` 用以支持 `webpack 4`
 - 修改 `package.json` 启动配置, 需要运行环境支持 `pm2`
+- 修改 `node` 版本范围, `>=6.11.5`
 
 **环境支持**
 - 可能需要 `react-tools` 为 `@0.13.3` 或更高版本

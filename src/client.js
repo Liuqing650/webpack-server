@@ -13,7 +13,7 @@ const history = syncHistoryWithStore(browserHistory, routingStore);
 const dest = document.getElementById('root');
 
 allStores.routing = routingStore;
-ReactDOM.render(
+ReactDOM.hydrate(
   <Provider { ...allStores }>
     <Router routes={getRoutes(allStores)} history={history} />
   </Provider>,
