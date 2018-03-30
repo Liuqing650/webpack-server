@@ -12,6 +12,7 @@ import Html from './helpers/Html';
 import { match, RouterContext } from 'react-router';
 import { Provider, useStaticRendering } from 'mobx-react';
 import { renderToString } from 'react-dom/server';
+import chalk from 'chalk';
 
 import assets from '../public/webpack-assets.json';
 import getRoutes from './routes';
@@ -31,14 +32,13 @@ if (!__DEV__) {
   /* Run express as webpack dev server */
   const webpack = require('webpack');
   const webpackConfig = require('../webpack/config.babel');
-  const Dashboard = require('webpack-dashboard');
-  const DashboardPlugin = require('webpack-dashboard/plugin');
-  const dashboard = new Dashboard();
+  // const Dashboard = require('webpack-dashboard');
+  // const DashboardPlugin = require('webpack-dashboard/plugin');
+  // const dashboard = new Dashboard();
   const compiler = webpack(webpackConfig);
 
   compiler.apply(new webpack.ProgressPlugin());
-  compiler.apply(new DashboardPlugin());
-
+  // compiler.apply(new DashboardPlugin());
   app.use(
     require('webpack-dev-middleware')(compiler, {
       publicPath: webpackConfig.output.publicPath,
@@ -60,10 +60,7 @@ if (!__DEV__) {
 
 console.log('assets------>', assets);
 
-app.use((req, resp) => {
-  // if (__DEVELOPMENT__) {
-  //   webpackIsomorphicToolsPlugin.refresh();
-  // }
+app.get('*', (req, resp) => {
   match({ routes: getRoutes('server'), location: req.originalUrl }, (error, redirectLocation, renderProps) => {
     if (renderProps) {
       console.log('路由被match', req.url);
@@ -86,14 +83,17 @@ app.use((req, resp) => {
     }
   })
 })
-
+console.log(555555);
 if (config.port) {
-  app.listen(config.port, (err) => {
-    if (err) {
-      console.error(err);
-    }
-    console.info('==>     [success]: Open http://%s:%s in a browser to view the app.', config.host, config.port);
+  const url = `http://${config.host}:${config.port}`;
+  app.listen(config.port, config.host, err => {
+
+    if (err) console.error(chalk.red(`==>     [error]: ${err}`));
+
+    console.info(chalk.green(`==>     [success]: Open ${url} in a browser to view the app.`));
   });
 } else {
-  console.error('==>     [error]: No PORT environment variable has been specified');
+  console.error(
+    chalk.red('==>     [error]: No PORT environment variable has been specified')
+  );
 }

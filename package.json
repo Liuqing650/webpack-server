@@ -20,12 +20,12 @@
   },
   "betterScripts": {
     "start-dev": {
-      "command": "nodemon ./bin/server.js",
+      "command": "node ./bin/server.js",
       "env": {
         "NODE_PATH": "./src",
         "NODE_ENV": "development",
         "HOST": "127.0.0.1",
-        "PORT": 3830
+        "PORT": 3300
       }
     },
     "build": {
@@ -51,6 +51,7 @@
     ]
   },
   "dependencies": {
+    "chalk": "^2.3.2",
     "helmet": "^3.12.0",
     "loadable-components": "^1.2.0",
     "mobx": "^3.0.0",

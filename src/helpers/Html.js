@@ -36,6 +36,7 @@ export default class Html extends Component {
     const envAssets = __DEV__
       ? { main: { js: '/assets/main.js', css: '/assets/main.css' } }
       : assets;
+    console.log('envAssets------->', envAssets);
     return (
       <html lang="en-us">
         <head>
@@ -45,17 +46,18 @@ export default class Html extends Component {
             .map(
               key => (
                 envAssets[key].css
-                  ? <link href={assets.styles[style]} key={key}
+                  ? <link href={envAssets[key].css} key={key}
                     rel="stylesheet" type="text/css" charSet="UTF-8" />
                   : ''
               )
-            ).join('')}
+            )}
         </head>
         <body>
           <div id="root" style={{ height: '100%' }} dangerouslySetInnerHTML={{ __html: content }} />
           <script dangerouslySetInnerHTML={{ __html: `window.__data=${JSON.stringify(stores)};` }} charSet="UTF-8" />
-          <script src={assets.javascript['common']} charSet="UTF-8" />
-          <script id="main" src={assets.javascript.main} charSet="UTF-8" />
+          {Object.keys(envAssets)
+            .map(key => envAssets[key].js ?
+              <script id="main" src={envAssets[key].js} charSet="UTF-8"></script> : '')}
         </body>
       </html>
     );
