@@ -1,7 +1,9 @@
 import Express from 'express';
+import compression from 'compression';
+import helmet from 'helmet';
 import path from 'path';
 import React from 'react';
-import ReactDOM from 'react-dom/server';
+import ReactDOMServer from 'react-dom/server';
 import config from './config';
 import favicon from 'serve-favicon';
 import fs from 'fs';
@@ -9,19 +11,59 @@ import http from 'http';
 import Html from './helpers/Html';
 import { match, RouterContext } from 'react-router';
 import { Provider, useStaticRendering } from 'mobx-react';
+import { renderToString } from 'react-dom/server';
+
+import assets from '../public/webpack-assets.json';
 import getRoutes from './routes';
 import { RouterStore } from 'mobx-react-router';
 import * as allStores from 'stores';
 useStaticRendering(true);
 const app = new Express();
-const server = new http.Server(app);
 
-app.use(favicon(path.join(__dirname, '..', 'static', 'favicon.ico')));
-app.use(Express.static(path.join(__dirname, '..', 'static')));
+app.use(helmet());
+app.use(compression());
+
+app.use(favicon(path.resolve(process.cwd(), 'public/favicon.ico')));
+
+if (!__DEV__) {
+  app.use(express.static(path.resolve(process.cwd(), 'public/dist')));
+} else {
+  /* Run express as webpack dev server */
+  const webpack = require('webpack');
+  const webpackConfig = require('../webpack/config.babel');
+  const Dashboard = require('webpack-dashboard');
+  const DashboardPlugin = require('webpack-dashboard/plugin');
+  const dashboard = new Dashboard();
+  const compiler = webpack(webpackConfig);
+
+  compiler.apply(new webpack.ProgressPlugin());
+  compiler.apply(new DashboardPlugin());
+
+  app.use(
+    require('webpack-dev-middleware')(compiler, {
+      publicPath: webpackConfig.output.publicPath,
+      headers: { 'Access-Control-Allow-Origin': '*' },
+      hot: true,
+      quiet: true, // lets WebpackDashboard do its thing
+      noInfo: true,
+      stats: 'minimal',
+      serverSideRender: true
+    })
+  );
+
+  app.use(
+    require('webpack-hot-middleware')(compiler, {
+      log: false // Turn it off for friendly-errors-webpack-plugin
+    })
+  );
+}
+
+console.log('assets------>', assets);
+
 app.use((req, resp) => {
-  if (__DEVELOPMENT__) {
-    webpackIsomorphicToolsPlugin.refresh();
-  }
+  // if (__DEVELOPMENT__) {
+  //   webpackIsomorphicToolsPlugin.refresh();
+  // }
   match({ routes: getRoutes('server'), location: req.originalUrl }, (error, redirectLocation, renderProps) => {
     if (renderProps) {
       console.log('路由被match', req.url);
@@ -34,19 +76,19 @@ app.use((req, resp) => {
         </Provider>
       );
       const renderHTML = <Html 
-        assets={webpackIsomorphicToolsPlugin.assets()}
+        assets={assets}
         component={component} {...allStores}
       />
       resp.status(200);
       resp.send(
-        ReactDOM.renderToString(renderHTML)
+        ReactDOMServer.renderToString(renderHTML)
       );
     }
   })
 })
 
 if (config.port) {
-  server.listen(config.port, (err) => {
+  app.listen(config.port, (err) => {
     if (err) {
       console.error(err);
     }

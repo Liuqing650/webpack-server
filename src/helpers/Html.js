@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom/server';
-// import serialize from 'serialize-javascript';
 import Helmet from 'react-helmet';
 import { toJS } from 'mobx';
 /**
@@ -34,17 +33,23 @@ export default class Html extends Component {
     const stores = this.prepareStore(allStore);
     const content = component ? ReactDOM.renderToString(component) : '';
     const head = Helmet.rewind();
+    const envAssets = __DEV__
+      ? { main: { js: '/assets/main.js', css: '/assets/main.css' } }
+      : assets;
     return (
       <html lang="en-us">
         <head>
           <link rel="shortcut icon" href="/favicon.ico" />
-          <title>webpack-server-123</title>
-          {
-            Object.keys(assets.styles).map((style, key) =>
-              <link href={assets.styles[style]} key={key}
-                rel="stylesheet" type="text/css" charSet="UTF-8" />
-            )
-          }
+          <title>webpack-server</title>
+          {Object.keys(envAssets)
+            .map(
+              key => (
+                envAssets[key].css
+                  ? <link href={assets.styles[style]} key={key}
+                    rel="stylesheet" type="text/css" charSet="UTF-8" />
+                  : ''
+              )
+            ).join('')}
         </head>
         <body>
           <div id="root" style={{ height: '100%' }} dangerouslySetInnerHTML={{ __html: content }} />

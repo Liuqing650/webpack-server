@@ -1,11 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { AppContainer } from 'react-hot-loader';
 import { Router, browserHistory } from 'react-router';
-import getRoutes from './routes';
 import { Provider } from 'mobx-react';
+import { RouterStore, syncHistoryWithStore } from 'mobx-react-router';
 import combineServerData from 'helpers/combineServer';
 import * as allStores from 'stores';
-import { RouterStore, syncHistoryWithStore } from 'mobx-react-router';
+import getRoutes from './routes';
 
 const routingStore = new RouterStore();
 combineServerData(allStores, window.__data);
@@ -13,9 +14,26 @@ const history = syncHistoryWithStore(browserHistory, routingStore);
 const dest = document.getElementById('root');
 
 allStores.routing = routingStore;
-ReactDOM.hydrate(
-  <Provider { ...allStores }>
-    <Router routes={getRoutes(allStores)} history={history} />
-  </Provider>,
-  dest
-);
+const render = () => {
+  ReactDOM.hydrate(
+    <AppContainer>
+      <Provider {...allStores}>
+        <Router routes={getRoutes(allStores)} history={history} />
+      </Provider>
+    </AppContainer>,
+    dest
+  );
+};
+
+if (module.hot) {
+  module.hot.accept('./routes', () => {
+    try {
+      // const nextRoutes = require('./routes');
+      console.log('nextRoutes------->');
+      render();
+      // render(nextRoutes);
+    } catch (error) {
+      console.error(`==> 😭  Routes hot reloading error ${error}`);
+    }
+  });
+}
