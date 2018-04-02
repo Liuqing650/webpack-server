@@ -1,1 +1,2 @@
-export clientStore from './client';
+import clientStore from './client';
+export default clientStore;

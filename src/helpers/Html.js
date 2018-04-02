@@ -34,9 +34,8 @@ export default class Html extends Component {
     const content = component ? ReactDOM.renderToString(component) : '';
     const head = Helmet.rewind();
     const envAssets = __DEV__
-      ? { main: { js: '/assets/main.js', css: '/assets/main.css' } }
+      ? { main: { js: '/dist/main.js', css: '/dist/main.css' } }
       : assets;
-    console.log('envAssets------->', envAssets);
     return (
       <html lang="en-us">
         <head>
@@ -46,7 +45,7 @@ export default class Html extends Component {
             .map(
               key => (
                 envAssets[key].css
-                  ? <link href={envAssets[key].css} key={key}
+                  ? <link href={envAssets[key].css} key={`css-${key}`}
                     rel="stylesheet" type="text/css" charSet="UTF-8" />
                   : ''
               )
@@ -57,7 +56,7 @@ export default class Html extends Component {
           <script dangerouslySetInnerHTML={{ __html: `window.__data=${JSON.stringify(stores)};` }} charSet="UTF-8" />
           {Object.keys(envAssets)
             .map(key => envAssets[key].js ?
-              <script id="main" src={envAssets[key].js} charSet="UTF-8"></script> : '')}
+              <script id="main" src={envAssets[key].js} key={`js-${key}`} charSet="UTF-8"></script> : '')}
         </body>
       </html>
     );

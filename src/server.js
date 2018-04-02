@@ -58,8 +58,6 @@ if (!__DEV__) {
   );
 }
 
-console.log('assets------>', assets);
-
 app.get('*', (req, resp) => {
   match({ routes: getRoutes('server'), location: req.originalUrl }, (error, redirectLocation, renderProps) => {
     if (renderProps) {
@@ -83,7 +81,6 @@ app.get('*', (req, resp) => {
     }
   })
 })
-console.log(555555);
 if (config.port) {
   const url = `http://${config.host}:${config.port}`;
   app.listen(config.port, config.host, err => {

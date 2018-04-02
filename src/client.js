@@ -9,10 +9,10 @@ import * as allStores from 'stores';
 import getRoutes from './routes';
 
 const routingStore = new RouterStore();
-combineServerData(allStores, window.__data);
 const history = syncHistoryWithStore(browserHistory, routingStore);
 const dest = document.getElementById('root');
 
+combineServerData(allStores, window.__data);
 allStores.routing = routingStore;
 const render = () => {
   ReactDOM.hydrate(
@@ -33,7 +33,7 @@ if (module.hot) {
       render();
       // render(nextRoutes);
     } catch (error) {
-      console.error(`==> 😭  Routes hot reloading error ${error}`);
+      console.error(`==> Routes hot reloading error ${error}`);
     }
   });
 }

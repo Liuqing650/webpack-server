@@ -10,7 +10,6 @@ const rootPath = path.resolve(process.cwd());
 
 const nodeEnv = process.env.NODE_ENV || 'development';
 const isDev = nodeEnv === 'development';
-
 const getPlugins = () => {
   // Common
   const plugins = [

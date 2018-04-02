@@ -15,6 +15,7 @@ export default class HomePage extends Component {
     this.props.clientStore.getInfo();
   };
   changePage = () => {
+    console.log(55555);
     this.props.routing.push('/new');
   }
   render() {
@@ -24,7 +25,7 @@ export default class HomePage extends Component {
         <h2>New Page</h2>
         <h4>{clientStore.title}: {clientStore.info}</h4>
         <button onClick={this.getInfo}>获取Store信息</button>
-        <button onClick={this.changePage}>跳转5</button>
+        <button onClick={this.changePage}>跳转</button>
       </div>
     );
   }
