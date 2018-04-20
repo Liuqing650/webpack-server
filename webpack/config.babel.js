@@ -30,13 +30,11 @@ const getPlugins = () => {
   ];
 
   if (isDev) {
-    // Development
     plugins.push(new webpack.HotModuleReplacementPlugin());
   } else {
     plugins.push(
-      // Production
       new webpack.HashedModuleIdsPlugin(),
-      new CleanWebpackPlugin([path.resolve(process.cwd(), 'public/dist')], { root: rootPath }),
+      new CleanWebpackPlugin([path.resolve(process.cwd(), 'public/assets')], { root: rootPath }),
       new CompressionPlugin({
         asset: '[path].gz[query]',
         algorithm: 'gzip',
@@ -44,19 +42,14 @@ const getPlugins = () => {
         threshold: 10240,
         minRatio: 0.8
       }),
-      // Visualize all of the webpack bundles
-      // Check "https://github.com/webpack-contrib/webpack-bundle-analyzer#options-for-plugin"
-      // for more configurations
       new BundleAnalyzerPlugin({
         analyzerMode: process.env.NODE_ENV === 'analyze' ? 'server' : 'disabled'
       })
     );
   }
-
   return plugins;
 };
 
-// Setup the entry for development/prodcution
 const getEntry = () => {
   // Development
   let entry = ['webpack-hot-middleware/client?reload=true', './src/client.js'];
@@ -68,25 +61,22 @@ const getEntry = () => {
 };
 module.exports = {
   mode: isDev ? 'development' : 'production', // 'development' or 'production' >=4.0.0
+  devtool: isDev ? 'cheap-module-source-map' : 'hidden-source-map',
   context: path.resolve(process.cwd()),
   entry: getEntry(),
-  devtool: 'inline-source-map',
   output: {
-    path: path.resolve(process.cwd(), 'public/dist'),
+    path: path.resolve(process.cwd(), 'public/assets'),
     filename: isDev ? '[name].js' : '[name].[chunkhash:8].js',
     chunkFilename: isDev ? '[name].chunk.js' : '[name].[chunkhash:8].chunk.js',
-    publicPath: '/dist/',
+    publicPath: '/assets/',
     pathinfo: isDev
   },
   resolve: {
-    alias: {
-      components: path.resolve(rootPath, 'src/components/'),
-      helpers: path.resolve(rootPath, 'src/helpers/'),
-      vendors: path.resolve(rootPath, 'src/vendors/'),
-      containers: path.resolve(rootPath, 'src/containers/'),
-      stores: path.resolve(rootPath, 'src/stores/')
-    }
+    modules: ['src', 'node_modules'],
+    descriptionFiles: ['package.json'],
+    extensions: ['.js', '.jsx', '.json']
   },
+  cache: isDev,
   module: {
     rules: [
       {

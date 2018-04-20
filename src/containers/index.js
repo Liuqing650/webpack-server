@@ -1,3 +1,9 @@
-export App from './app';
-export HomePage from './homePage';
-export NextPage from './nextPage';
+import App from './app';
+import HomePage from './homePage';
+import NextPage from './nextPage';
+
+export {
+  App,
+  HomePage,
+  NextPage
+};

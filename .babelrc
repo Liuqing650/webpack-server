@@ -3,6 +3,7 @@
   "plugins": [
     "react-hot-loader/babel",
     "transform-runtime",
+    "loadable-components/babel",
     "transform-decorators-legacy"
   ],
   "env": {

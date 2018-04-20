@@ -15,7 +15,6 @@ export default class HomePage extends Component {
     this.props.clientStore.getInfo();
   };
   changePage = () => {
-    console.log(55555);
     this.props.routing.push('/new');
   }
   render() {

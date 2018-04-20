@@ -8,4 +8,4 @@ class ClientStore {
     this.info = 'success!';
   }
 }
-export default new ClientStore();
+export default ClientStore;
