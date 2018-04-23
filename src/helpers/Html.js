@@ -59,6 +59,11 @@ const Html = ({ head, assets, htmlContent, loadableStateTag, ...store }) => {
               `window.__INITIAL_STATE__=${JSON.stringify(prepareStore(store))};`
           }}
         />
+        <div
+          dangerouslySetInnerHTML={{
+            __html: loadableStateTag
+          }}
+        />
         {Object.keys(envAssets)
           .map((key, index) => <script key={`js-${index}`} src={envAssets[key].js}></script>)}
       </body>

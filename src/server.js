@@ -10,7 +10,6 @@ import fs from 'fs';
 import http from 'http';
 import chalk from 'chalk';
 import url from 'url';
-import { renderToString } from 'react-dom/server';
 import { RouterStore } from 'mobx-react-router';
 import { StaticRouter } from 'react-router-dom';
 import { renderRoutes, matchRoutes } from 'react-router-config';
@@ -19,21 +18,20 @@ import { Provider, useStaticRendering } from 'mobx-react';
 import { parseUrl } from 'query-string';
 import config from './config';
 import Html from './helpers/Html';
-import { serverStore } from './stores';
+// import { serverStore } from './stores';
 
 import routes from './routes';
 import App from './containers/app';
 import assets from '../public/webpack-assets.json';
 useStaticRendering(true);
 const app = new Express();
-const renderHtml = (head, htmlContent, loadableStateTag, store) => {
+const renderHtml = (head, htmlContent, loadableStateTag) => {
   const html = renderToStaticMarkup(
     <Html
       head={head}
       assets={assets}
       htmlContent={htmlContent}
-      loadableStateTag
-      {...store}
+      loadableStateTag={loadableStateTag}
     />
   ); 
   return `${'<!DOCTYPE html>\n' +
@@ -44,38 +42,18 @@ const renderHtml = (head, htmlContent, loadableStateTag, store) => {
 }
 
 // 默认服务端渲染函数
-const defaultSend = (req, resp, reqPathName, store) => {
+const defaultSend = (req, resp, reqPathName) => {
   const routingStore = new RouterStore();
   const reqUrlObj = {
     pathname: reqPathName,
     query: parseUrl(req.url).query
   };
-  const loadBranchData = () => {
-    const branch = matchRoutes(routes, req.path);
-
-    const promises = branch.map(({ route, match }) => {
-      if (route.loadData) {
-        return Promise.all(
-          route
-            .loadData({ params: match.params, getState: store })
-            .map(item => store.dispatch(item))
-        );
-      }
-
-      return Promise.resolve(null);
-    });
-
-    return Promise.all(promises);
-  };
 
   (async () => {
     try {
-      // Load data from server-side first
-      await loadBranchData();
-
       const staticContext = {};
       const AppComponent = (
-        <Provider store={store}>
+        <Provider>
           {/* Setup React-Router server-side rendering */}
           <StaticRouter location={req.path} context={staticContext}>
             {renderRoutes(routes)}
@@ -88,7 +66,6 @@ const defaultSend = (req, resp, reqPathName, store) => {
       if (staticContext.url) {
         res.status(301).setHeader('Location', staticContext.url);
         res.end();
-
         return;
       }
 
@@ -96,7 +73,6 @@ const defaultSend = (req, resp, reqPathName, store) => {
       getLoadableState(AppComponent).then(loadableState => {
         const head = Helmet.renderStatic();
         const htmlContent = renderToString(AppComponent);
-        const initialStore = store;
         const loadableStateTag = loadableState.getScriptTag();
         console.log('loadableStateTag------>', loadableStateTag);
 
@@ -109,9 +85,8 @@ const defaultSend = (req, resp, reqPathName, store) => {
           .send(
             renderHtml(
               head,
-              renderToString(htmlContent),
-              loadableStateTag,
-              initialStore
+              htmlContent,
+              loadableStateTag
             )
           );
       });
@@ -163,8 +138,8 @@ if (!__DEV__) {
 app.get('*', (req, resp) => {
   /*服务端注入RouterStore*/
   const reqPathName = url.parse(req.url).pathname;
-  const store = serverStore();
-  defaultSend(req, resp, reqPathName, store);
+  // const store = serverStore();
+  defaultSend(req, resp, reqPathName);
 })
 if (config.port) {
   const url = `http://${config.host}:${config.port}`;
