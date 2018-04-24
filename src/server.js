@@ -51,11 +51,12 @@ const defaultSend = (req, resp, reqPathName) => {
 
   (async () => {
     try {
-      const staticContext = {};
+      await loadBranchData();
+      const context = {};
       const AppComponent = (
         <Provider>
           {/* Setup React-Router server-side rendering */}
-          <StaticRouter location={req.path} context={staticContext}>
+          <StaticRouter location={req.url} context={context}>
             {renderRoutes(routes)}
           </StaticRouter>
         </Provider>
@@ -63,8 +64,8 @@ const defaultSend = (req, resp, reqPathName) => {
 
       // Check if the render result contains a redirect, if so we need to set
       // the specific status and redirect header and end the response
-      if (staticContext.url) {
-        res.status(301).setHeader('Location', staticContext.url);
+      if (context.url) {
+        res.status(301).setHeader('Location', context.url);
         res.end();
         return;
       }
@@ -77,7 +78,7 @@ const defaultSend = (req, resp, reqPathName) => {
         console.log('loadableStateTag------>', loadableStateTag);
 
         // Check page status
-        const status = staticContext.status === '404' ? 404 : 200;
+        const status = context.status === '404' ? 404 : 200;
 
         // Pass the route and initial state into html template
         resp

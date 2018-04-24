@@ -36,7 +36,7 @@ loadComponents().then(() => {
 if (module.hot) {
   module.hot.accept('./routes', () => {
     try {
-      const nextRoutes = require('./routes');
+      const nextRoutes = require('./routes').default;
       render(nextRoutes);
     } catch (error) {
       console.error(`==> Routes hot reloading error ${error}`);
