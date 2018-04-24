@@ -23,7 +23,7 @@ export default class HomePage extends Component {
       <div className={styles.wrap}>
         <h2>New Page</h2>
         <h4>{clientStore.title}: {clientStore.info}</h4>
-        <button onClick={this.getInfo}>获取Store信息</button>
+        <button onClick={this.getInfo}>获取Store信息--4</button>
         <button onClick={this.changePage}>跳转</button>
       </div>
     );

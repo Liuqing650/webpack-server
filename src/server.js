@@ -6,32 +6,31 @@ import path from 'path';
 import React from 'react';
 import { renderToString, renderToStaticMarkup} from 'react-dom/server';
 import favicon from 'serve-favicon';
-import fs from 'fs';
 import http from 'http';
 import chalk from 'chalk';
 import url from 'url';
 import { RouterStore } from 'mobx-react-router';
+import { RouterContext, match } from 'react-router';
 import { StaticRouter } from 'react-router-dom';
-import { renderRoutes, matchRoutes } from 'react-router-config';
 import { getLoadableState } from 'loadable-components/server';
 import { Provider, useStaticRendering } from 'mobx-react';
 import { parseUrl } from 'query-string';
 import config from './config';
 import Html from './helpers/Html';
-// import { serverStore } from './stores';
+import getRoutes from './routes';
+import { serverStores } from './stores';
 
-import routes from './routes';
-import App from './containers/app';
 import assets from '../public/webpack-assets.json';
+
 useStaticRendering(true);
 const app = new Express();
-const renderHtml = (head, htmlContent, loadableStateTag) => {
+const renderHtml = (head, htmlContent, allStore) => {
   const html = renderToStaticMarkup(
     <Html
       head={head}
       assets={assets}
       htmlContent={htmlContent}
-      loadableStateTag={loadableStateTag}
+      {...allStore}
     />
   ); 
   return `${'<!DOCTYPE html>\n' +
@@ -42,61 +41,39 @@ const renderHtml = (head, htmlContent, loadableStateTag) => {
 }
 
 // 默认服务端渲染函数
-const defaultSend = (req, resp, reqPathName) => {
-  const routingStore = new RouterStore();
-  const reqUrlObj = {
-    pathname: reqPathName,
-    query: parseUrl(req.url).query
-  };
-
-  (async () => {
-    try {
-      await loadBranchData();
-      const context = {};
-      const AppComponent = (
-        <Provider>
-          {/* Setup React-Router server-side rendering */}
-          <StaticRouter location={req.url} context={context}>
-            {renderRoutes(routes)}
-          </StaticRouter>
+const defaultSend = (req, resp) => {
+  const reqPathName = url.parse(req.url).pathname;
+  const allStore = serverStores();
+  match({ routes: getRoutes('server'), location: reqPathName }, (err, redirectLocation, renderProps) => {
+    if (err) {
+      resp.status(500).end(`Internal Server Error ${err}`);
+    } else if (redirectLocation) {
+      resp.redirect(redirectLocation.pathname + redirectLocation.search);
+    } else if (renderProps) {
+      const routingStore = new RouterStore();
+      allStore.routing = routingStore;
+      const head = Helmet.renderStatic();
+      const htmlContent = (
+        <Provider {...allStore}>
+          <RouterContext {...renderProps} />
         </Provider>
       );
-
-      // Check if the render result contains a redirect, if so we need to set
-      // the specific status and redirect header and end the response
-      if (context.url) {
-        res.status(301).setHeader('Location', context.url);
-        res.end();
-        return;
-      }
-
-      // Extract loadable state from application tree (loadable-components setup)
-      getLoadableState(AppComponent).then(loadableState => {
-        const head = Helmet.renderStatic();
-        const htmlContent = renderToString(AppComponent);
-        const loadableStateTag = loadableState.getScriptTag();
-        console.log('loadableStateTag------>', loadableStateTag);
-
-        // Check page status
-        const status = context.status === '404' ? 404 : 200;
-
-        // Pass the route and initial state into html template
-        resp
-          .status(status)
-          .send(
-            renderHtml(
-              head,
-              htmlContent,
-              loadableStateTag
-            )
-          );
-      });
-    } catch (err) {
+      console.log('htmlContent------->', htmlContent);
+      resp
+        .status(200)
+        .send(
+          renderHtml(
+            head,
+            htmlContent,
+            allStore
+          )
+        );
+    } else {
       resp.status(404).send('Not Found :(');
 
       console.error(chalk.red(`==> 😭  Rendering routes error: ${err}`));
     }
-  })();
+  });
 };
 
 app.use(helmet());
@@ -138,9 +115,8 @@ if (!__DEV__) {
 
 app.get('*', (req, resp) => {
   /*服务端注入RouterStore*/
-  const reqPathName = url.parse(req.url).pathname;
   // const store = serverStore();
-  defaultSend(req, resp, reqPathName);
+  defaultSend(req, resp);
 })
 if (config.port) {
   const url = `http://${config.host}:${config.port}`;

@@ -1,8 +1,8 @@
-import ClientStore from './client';
+import clientStore, { ClientStoreClass } from './client';
 
-export const serverStore = () => ({
-  clientStore: new ClientStore()
+export const serverStores = () => ({
+  clientStore: new ClientStoreClass()
 });
-export const clientStore = () => ({
-  clientStore: new ClientStore()
+export const clientStores = () => ({
+  clientStore
 });

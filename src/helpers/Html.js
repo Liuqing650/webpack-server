@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { renderToString } from 'react-dom/server';
 import { toJS } from 'mobx';
 
 function prepareStore(allStore) {
@@ -11,12 +12,14 @@ function prepareStore(allStore) {
   return output;
 }
 
-const Html = ({ head, assets, htmlContent, loadableStateTag, ...store }) => {
+const Html = ({ head, assets, htmlContent, ...allStore }) => {
   const attrs = head.htmlAttributes.toComponent();
   const { lang, ...rest } = attrs || {};
   const envAssets = __DEV__
     ? { main: { js: '/assets/main.js', css: '/assets/main.css' } }
     : assets;
+  const stores = prepareStore(allStore);
+  const content = htmlContent ? renderToString(htmlContent) : '';
   return (
     <html {...rest} lang={lang || 'en'}>
       <head>
@@ -50,18 +53,13 @@ const Html = ({ head, assets, htmlContent, loadableStateTag, ...store }) => {
         <div
           id="root"
           style={{ height: '100%' }}
-          dangerouslySetInnerHTML={{ __html: htmlContent || '' }}
+          dangerouslySetInnerHTML={{ __html: content || '' }}
         />
         <script
           dangerouslySetInnerHTML={{
             __html:
-              store &&
-              `window.__INITIAL_STATE__=${JSON.stringify(prepareStore(store))};`
-          }}
-        />
-        <div
-          dangerouslySetInnerHTML={{
-            __html: loadableStateTag
+              stores &&
+              `window.__INITIAL_STATE__=${JSON.stringify(stores)};`
           }}
         />
         {Object.keys(envAssets)
@@ -73,7 +71,7 @@ const Html = ({ head, assets, htmlContent, loadableStateTag, ...store }) => {
 
 Html.defaultProps = { htmlContent: '' };
 Html.propTypes = {
-  htmlContent: PropTypes.string
-  // store: PropTypes.object // eslint-disable-line react/forbid-prop-types
+  htmlContent: PropTypes.object,
+  allStore: PropTypes.object // eslint-disable-line react/forbid-prop-types
 };
 export default Html;
