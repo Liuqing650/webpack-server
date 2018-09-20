@@ -5,29 +5,27 @@ import Helmet from 'react-helmet';
 import path from 'path';
 import React from 'react';
 import { renderToString, renderToStaticMarkup} from 'react-dom/server';
-import favicon from 'serve-favicon';
 import http from 'http';
 import chalk from 'chalk';
 import url from 'url';
 import { RouterStore } from 'mobx-react-router';
 import { RouterContext, match } from 'react-router';
 import { StaticRouter } from 'react-router-dom';
-import { getLoadableState } from 'loadable-components/server';
 import { Provider, useStaticRendering } from 'mobx-react';
 import { parseUrl } from 'query-string';
 import config from './config';
 import Html from './helpers/Html';
 import getRoutes from './routes';
+import App from './containers/app';
 import { serverStores } from './stores';
 
 import assets from '../public/webpack-assets.json';
 
 useStaticRendering(true);
 const app = new Express();
-const renderHtml = (head, htmlContent, allStore) => {
+const renderHtml = (htmlContent, allStore) => {
   const html = renderToStaticMarkup(
     <Html
-      head={head}
       assets={assets}
       htmlContent={htmlContent}
       {...allStore}
@@ -52,22 +50,19 @@ const defaultSend = (req, resp) => {
     } else if (renderProps) {
       const routingStore = new RouterStore();
       allStore.routing = routingStore;
-      const head = Helmet.renderStatic();
+      const context = {};
       const htmlContent = (
         <Provider {...allStore}>
+            <StaticRouter location={req.url} context={context}>
+              <App />
+            </StaticRouter>
           <RouterContext {...renderProps} />
         </Provider>
       );
       console.log('htmlContent------->', htmlContent);
-      resp
-        .status(200)
-        .send(
-          renderHtml(
-            head,
-            htmlContent,
-            allStore
-          )
-        );
+      resp.status(200);
+
+      resp.send(renderHtml(htmlContent, allStore));
     } else {
       resp.status(404).send('Not Found :(');
 
@@ -78,8 +73,6 @@ const defaultSend = (req, resp) => {
 
 app.use(helmet());
 app.use(compression());
-
-app.use(favicon(path.resolve(process.cwd(), 'public/favicon.ico')));
 
 if (!__DEV__) {
   app.use(express.static(path.resolve(process.cwd(), 'public/dist')));

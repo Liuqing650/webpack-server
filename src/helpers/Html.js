@@ -12,16 +12,14 @@ function prepareStore(allStore) {
   return output;
 }
 
-const Html = ({ head, assets, htmlContent, ...allStore }) => {
-  const attrs = head.htmlAttributes.toComponent();
-  const { lang, ...rest } = attrs || {};
+const Html = ({ assets, htmlContent, ...allStore }) => {
   const envAssets = __DEV__
     ? { main: { js: '/assets/main.js', css: '/assets/main.css' } }
     : assets;
   const stores = prepareStore(allStore);
   const content = htmlContent ? renderToString(htmlContent) : '';
   return (
-    <html {...rest} lang={lang || 'en'}>
+    <html {...rest} lang={'en'}>
       <head>
         <meta charSet="utf-8" />
         <meta httpEquiv="x-ua-compatible" content="ie=edge" />
@@ -31,11 +29,6 @@ const Html = ({ head, assets, htmlContent, ...allStore }) => {
         />
         <title>webpack-server</title>
         <link rel="shortcut icon" href="/favicon.ico" />
-
-        {head.title.toComponent()}
-        {head.base.toComponent()}
-        {head.meta.toComponent()}
-        {head.link.toComponent()}
 
         {Object.keys(envAssets)
           .map((key, index) =>
