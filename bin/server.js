@@ -1,5 +1,10 @@
 #!/usr/bin/env node
-require('../server.babel');
+require('babel-polyfill');
+require('babel-register')({
+    "plugins": [
+        "dynamic-import-node"
+    ]
+});
 
 global.__CLIENT__ = false;
 global.__SERVER__ = true;

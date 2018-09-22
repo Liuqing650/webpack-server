@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { renderToString } from 'react-dom/server';
 import { toJS } from 'mobx';
 
 function prepareStore(allStore) {
@@ -12,14 +11,12 @@ function prepareStore(allStore) {
   return output;
 }
 
-const Html = ({ assets, htmlContent, ...allStore }) => {
+const Html = ({ assets, htmlContent, ...store }) => {
   const envAssets = __DEV__
     ? { main: { js: '/assets/main.js', css: '/assets/main.css' } }
     : assets;
-  const stores = prepareStore(allStore);
-  const content = htmlContent ? renderToString(htmlContent) : '';
   return (
-    <html {...rest} lang={'en'}>
+    <html lang={'en'}>
       <head>
         <meta charSet="utf-8" />
         <meta httpEquiv="x-ua-compatible" content="ie=edge" />
@@ -46,13 +43,13 @@ const Html = ({ assets, htmlContent, ...allStore }) => {
         <div
           id="root"
           style={{ height: '100%' }}
-          dangerouslySetInnerHTML={{ __html: content || '' }}
+          dangerouslySetInnerHTML={{ __html: htmlContent || '' }}
         />
         <script
           dangerouslySetInnerHTML={{
             __html:
-              stores &&
-              `window.__INITIAL_STATE__=${JSON.stringify(stores)};`
+              store &&
+              `window.__INITIAL_STATE__=${JSON.stringify(prepareStore(store))};`
           }}
         />
         {Object.keys(envAssets)

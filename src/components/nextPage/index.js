@@ -1,21 +1,22 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { observer, inject } from 'mobx-react';
+import { withRouter } from 'react-router-dom';
 import styles from './index.less';
 
-@inject('clientStore', 'routing')
+@inject('clientStore')
+@withRouter
 @observer
 export default class NextPage extends Component {
   static proptypes = {
     clientStore: PropTypes.object,
-    routing: PropTypes.object,
   }
 
   getInfo = () => {
     this.props.clientStore.getInfo();
   };
   goBack = () => {
-    this.props.routing.push('/');
+    this.props.history.push('/');
   }
   render() {
     const { clientStore } = this.props;

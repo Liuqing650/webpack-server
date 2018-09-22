@@ -3,10 +3,11 @@ import { observable, action, extendObservable } from 'mobx';
 class ClientStore {
   @observable title = 'hello mobx';
   @observable info = 'nothing';
-  @observable routing = {};
+  @observable env = '';
 
   constructor(initialState) {
     if (initialState) {
+      console.log('initialState----->', initialState);
       extendObservable(this, initialState.clientStore);
     }
   }

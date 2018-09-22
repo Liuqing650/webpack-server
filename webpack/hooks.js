@@ -2,7 +2,7 @@
 
 /* Require hooks for server-side */
 const hook = require('css-modules-require-hook');
-const lessParser = require('postcss-less').parse;
+const parseLess = require('postcss-less').parse;
 // const syntax = require('postcss-less');
 const path = require('path');
 module.exports = () => {
@@ -12,7 +12,10 @@ module.exports = () => {
     generateScopedName: '[path]___[name]__[local]___[hash:base64:5]',
     extensions: ['.css', '.less'],
     prepend: [require('autoprefixer')],
-    processorOpts: { parser: lessParser },
+    // processorOpts: { parser: lessParser },
+    preprocessCss: function(css, filename) {
+      return parseLess(css, filename);
+    },
     // Must be the same with the "context" of webpack LoaderOptionsPlugin
     // see here: https://github.com/css-modules/css-modules-require-hook/issues/86
     rootDir: path.resolve(process.cwd(), 'src'),

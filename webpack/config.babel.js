@@ -3,53 +3,58 @@ import webpack from 'webpack';
 import AssetsPlugin from 'assets-webpack-plugin';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import StyleLintPlugin from 'stylelint-webpack-plugin';
-import UglifyJsPlugin from 'uglifyjs-webpack-plugin';
 import CleanWebpackPlugin from 'clean-webpack-plugin';
+import MinifyPlugin from 'babel-minify-webpack-plugin';
 
 const rootPath = path.resolve(process.cwd());
 
 const nodeEnv = process.env.NODE_ENV || 'development';
 const isDev = nodeEnv === 'development';
 
+const CSSModules = true;
+const eslint = false;
+const stylelint = false;
 
-const WebpackIsomorphicToolsPlugin = require('webpack-isomorphic-tools/plugin');
-const webpackIsomorphicToolsPlugin = new WebpackIsomorphicToolsPlugin(
-  require('./hooks')
-).development(isDev);
+const vendor = [
+  'react',
+  'react-dom'
+];
 
 const getPlugins = () => {
   // Common
   const plugins = [
     new AssetsPlugin({ path: path.resolve(process.cwd(), 'public') }),
+    new ExtractTextPlugin({
+      filename: isDev ? '[name].css' : '[name].[contenthash:8].css',
+      allChunks: true,
+      ignoreOrder: CSSModules,
+      disable: isDev
+    }),
+    new StyleLintPlugin({ failOnError: stylelint }),
     new webpack.EnvironmentPlugin({ NODE_ENV: JSON.stringify(nodeEnv) }),
     new webpack.DefinePlugin({
       __CLIENT__: true,
       __SERVER__: false,
       __DEVELOPMENT__: true,
       __DEV__: isDev
-    }),
-    webpackIsomorphicToolsPlugin
+    })
   ];
 
   if (isDev) {
-    plugins.push(new webpack.HotModuleReplacementPlugin());
+    plugins.push(
+      new webpack.HotModuleReplacementPlugin(),
+      new webpack.IgnorePlugin(/webpack-assets\.json$/)
+    );
   } else {
     plugins.push(
+      new MinifyPlugin({}, { test: /\.jsx?$/, comments: false }),
       new webpack.HashedModuleIdsPlugin(),
+      new webpack.optimize.CommonsChunkPlugin({
+        name: 'vendor',
+        minChunks: Infinity
+      }),
       new CleanWebpackPlugin([path.resolve(process.cwd(), 'public/assets')], { root: rootPath }),
       new webpack.optimize.ModuleConcatenationPlugin(),
-      new UglifyJsPlugin({
-        uglifyOptions: {
-          beautify: true, // 最紧凑的输出
-          comments: true, // 删除所有的注释
-          compress: {
-            warnings: false,
-            drop_console: !PREVIEW, // 删除所有的 `console` 语句
-            collapse_vars: true,
-            reduce_vars: true, // 提取出出现多次但是没有定义成变量去引用的静态值
-          }
-        }
-      }),
     );
   }
   return plugins;
@@ -57,10 +62,15 @@ const getPlugins = () => {
 
 const getEntry = () => {
   // Development
-  let entry = ['webpack-hot-middleware/client?reload=true', './src/client.js'];
+  let entry = ['react-hot-loader/patch', 'webpack-hot-middleware/client?reload=true', './src/client.js'];
 
   // Prodcution
-  if (!isDev) entry = ['./src/client.js'];
+  if (!isDev) {
+    entry = {
+      main: './src/client.js',
+      vendor
+    };
+  }
 
   return entry;
 };
@@ -193,11 +203,11 @@ module.exports = {
   module: {
     loaders: webpackLoaders()
   },
-  optimization: {
-    splitChunks: {
-      // Auto split vendor modules in production only
-      chunks: isDev ? 'async' : 'all'
-    }
-  },
-  plugins: getPlugins()
+  plugins: getPlugins(),
+  node: {
+    fs: 'empty',
+    vm: 'empty',
+    net: 'empty',
+    tls: 'empty'
+  }
 }
