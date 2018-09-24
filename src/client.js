@@ -5,23 +5,25 @@ import { AppContainer } from 'react-hot-loader';
 import { Router } from 'react-router-dom';
 import { Provider } from 'mobx-react';
 import { useStrict } from 'mobx';
-import { createBrowserHistory, createMemoryHistory } from 'history';
+import { createBrowserHistory } from 'history';
 import { clientCreateStore } from './stores';
 import App from './containers/app';
 
 useStrict(true);
-const store = typeof window !== 'undefined' ? clientCreateStore() : createMemoryHistory();
+const store = clientCreateStore();
 const browserHistory = createBrowserHistory();
 
 const dest = document.getElementById('root');
 const renderApp = () => {
   Loadable.preloadReady().then(() => {
     hydrate(
-      <Provider {...store}>
-        <Router history={browserHistory}>
-          <App />
-        </Router>
-      </Provider>,
+      <AppContainer>
+        <Provider {...store}>
+          <Router history={browserHistory}>
+            <App />
+          </Router>
+        </Provider>
+      </AppContainer>,
       dest
     );
   });

@@ -61,7 +61,7 @@ const Html = ({ assets, htmlContent, ...store }) => {
 
 Html.defaultProps = { htmlContent: '' };
 Html.propTypes = {
-  htmlContent: PropTypes.object,
+  htmlContent: PropTypes.string,
   allStore: PropTypes.object // eslint-disable-line react/forbid-prop-types
 };
 export default Html;

@@ -1,1 +1,6 @@
-{"HomePage":{"js":"/assets/HomePage.chunk.js"},"NextPage":{"js":"/assets/NextPage.chunk.js"},"main":{"js":"/assets/main.js"}}
+{
+  "main.js": "/assets/main.f2e6a132.js",
+  "main.css": "/assets/main.7a4af962.css",
+  "main.css.map": "/assets/main.7a4af962.css.map",
+  "vendor.js": "/assets/vendor.44177c9c.js"
+}

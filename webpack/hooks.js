@@ -1,19 +1,20 @@
 /* @flow */
 
 /* Require hooks for server-side */
+const path = require('path');
 const hook = require('css-modules-require-hook');
 const parseLess = require('postcss-less').parse;
 // const syntax = require('postcss-less');
-const path = require('path');
+
 module.exports = () => {
   // CSS modules
   hook({
     // Must use the same pattern with your webpack config
-    generateScopedName: '[path]___[name]__[local]___[hash:base64:5]',
+    generateScopedName: '[path]__[name]__[local]__[hash:base64:5]',
     extensions: ['.css', '.less'],
     prepend: [require('autoprefixer')],
     // processorOpts: { parser: lessParser },
-    preprocessCss: function(css, filename) {
+    preprocessCss: (css, filename) => {
       return parseLess(css, filename);
     },
     // Must be the same with the "context" of webpack LoaderOptionsPlugin
