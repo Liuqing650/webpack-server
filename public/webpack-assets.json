@@ -1,6 +1,20 @@
 {
-  "main.js": "/assets/main.f2e6a132.js",
-  "main.css": "/assets/main.7a4af962.css",
-  "main.css.map": "/assets/main.7a4af962.css.map",
-  "vendor.js": "/assets/vendor.44177c9c.js"
+  "javascript": {
+    "NextPage": "/assets/NextPage.chunk.js",
+    "main": "/assets/main.js"
+  },
+  "styles": {},
+  "assets": {
+    "./src/components/homePage/index.less": {
+      "wrap": "components-homePage-__index__wrap__10Z1e",
+      "_style": ".components-homePage-__index__wrap__10Z1e {\n  border: 3px solid #ff9800;\n  text-align: center;\n  cursor: pointer;\n}\n.components-homePage-__index__wrap__10Z1e h2 {\n  color: red;\n}\n.components-homePage-__index__wrap__10Z1e h2:hover {\n  color: green;\n}\n"
+    },
+    "./src/components/nextPage/index.less": {
+      "wrap": "components-nextPage-__index__wrap__3xnVs",
+      "_style": ".components-nextPage-__index__wrap__3xnVs {\n  border: 3px solid #ff9800;\n  text-align: center;\n  cursor: pointer;\n}\n.components-nextPage-__index__wrap__3xnVs h2 {\n  color: rgba(102, 51, 153, 0.575);\n}\n.components-nextPage-__index__wrap__3xnVs h2:hover {\n  color: rebeccapurple;\n}\n"
+    }
+  },
+  "webpack": {
+    "version": "3.10.0"
+  }
 }

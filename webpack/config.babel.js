@@ -3,8 +3,9 @@ import webpack from 'webpack';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import StyleLintPlugin from 'stylelint-webpack-plugin';
 import CleanWebpackPlugin from 'clean-webpack-plugin';
-import UglifyJsPlugin from 'uglifyjs-webpack-plugin';
-import ManifestPlugin from 'webpack-manifest-plugin';
+import MinifyPlugin from 'babel-minify-webpack-plugin';
+import WebpackIsomorphicToolsPlugin from 'webpack-isomorphic-tools/plugin';
+import FriendlyErrorsWebpackPlugin from 'friendly-errors-webpack-plugin';
 
 const rootPath = path.resolve(process.cwd());
 
@@ -21,13 +22,11 @@ const vendor = [
 ];
 
 console.log(isDev ? '开发模式' : '发布模式');
+
+const webpackIsomorphicToolsPlugin = new WebpackIsomorphicToolsPlugin(require('./webpack-isomorphic-tools-configuration')).development(isDev);
 const getPlugins = () => {
   // Common
   const plugins = [
-    new ManifestPlugin({
-      fileName: path.resolve(process.cwd(), 'public/webpack-assets.json'),
-      filter: file => file.isInitial
-    }),
     new ExtractTextPlugin({
       filename: isDev ? '[name].css' : '[name].[contenthash:8].css',
       allChunks: true,
@@ -36,43 +35,36 @@ const getPlugins = () => {
     }),
     new StyleLintPlugin({ failOnError: stylelint }),
     new webpack.EnvironmentPlugin({ NODE_ENV: JSON.stringify(nodeEnv) }),
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'vendor',
-      minChunks: Infinity
-    }),
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'manifest'
-    }),
     new webpack.DefinePlugin({
+      'process.env.NODE_ENV': nodeEnv,
       __CLIENT__: true,
       __SERVER__: false,
       __DEVELOPMENT__: true,
       __DEV__: isDev
-    })
+    }),
+    new webpack.NoEmitOnErrorsPlugin(),
+    webpackIsomorphicToolsPlugin
   ];
 
   if (isDev) {
     plugins.push(
       new webpack.HotModuleReplacementPlugin(),
       new webpack.NamedModulesPlugin(),
+      new FriendlyErrorsWebpackPlugin(),
       new webpack.IgnorePlugin(/webpack-assets\.json$/)
     );
   } else {
     plugins.push(
       new CleanWebpackPlugin([path.resolve(process.cwd(), 'public/assets')], { root: rootPath }),
       new webpack.HashedModuleIdsPlugin(),
+      new MinifyPlugin({}, { test: /\.js?$/, comments: false }),
       new webpack.optimize.ModuleConcatenationPlugin(),
-      new UglifyJsPlugin({
-        uglifyOptions: {
-          beautify: true, // 最紧凑的输出
-          comments: true, // 删除所有的注释
-          compress: {
-            warnings: false,
-            drop_console: true, // 删除所有的 `console` 语句
-            collapse_vars: true,
-            reduce_vars: true, // 提取出出现多次但是没有定义成变量去引用的静态值
-          }
-        }
+      new webpack.optimize.CommonsChunkPlugin({
+        name: 'vendor',
+        minChunks: Infinity
+      }),
+      new webpack.optimize.CommonsChunkPlugin({
+        name: 'manifest'
       })
     );
   }
@@ -81,10 +73,7 @@ const getPlugins = () => {
 
 const getEntry = () => {
   // Development
-  let entry = {
-    main: ['react-hot-loader/patch', 'webpack-hot-middleware/client?reload=true', './src/client.js'],
-    vendor
-  };
+  let entry = ['react-hot-loader/patch', 'webpack-hot-middleware/client?reload=true', './src/client.js'];
 
   // Prodcution
   if (!isDev) {
@@ -114,7 +103,16 @@ const webpackLoaders = () => {
       use: ExtractTextPlugin.extract(
         {
           fallback: 'style-loader',
-          use:['css-loader', 'postcss-loader']
+          use:[
+            {
+              loader: 'css-loader',
+              options: {
+                importLoaders: 1,
+                context: path.resolve(process.cwd(), 'src'),
+                sourceMap: true,
+                minimize: !isDev
+              }
+            }, 'postcss-loader']
         },
       )
     },
@@ -124,7 +122,17 @@ const webpackLoaders = () => {
       use: ExtractTextPlugin.extract(
         {
           fallback: 'style-loader',
-          use:['css-loader', 'postcss-loader']
+          use:[
+            {
+              loader: 'css-loader',
+              options: {
+                modules: CSSModules,
+                importLoaders: 1,
+                context: path.resolve(process.cwd(), 'src'),
+                sourceMap: true,
+                minimize: !isDev
+              }
+            }, 'postcss-loader']
         },
       )
     }, {
@@ -134,10 +142,20 @@ const webpackLoaders = () => {
         {
           fallback: 'style-loader',
           use:[
-            'css-loader', 'postcss-loader', 
+              {
+                loader: 'css-loader',
+                options: {
+                  importLoaders: 2,
+                  modules: CSSModules,
+                  localIdentName: '[path]__[name]__[local]__[hash:base64:5]',
+                  context: path.resolve(process.cwd(), 'src'),
+                  sourceMap: true
+                }
+              }, 'postcss-loader', 
               {
                 loader: 'less-loader',
                 options: {
+                  outputStyle: 'expanded',
                   javascriptEnabled: true
                 }
               }
@@ -154,11 +172,13 @@ const webpackLoaders = () => {
             {
               loader: 'css-loader',
               options: {
-                modules: true,
                 import: true,
-                importLoaders: 1,
+                modules: CSSModules,
+                importLoaders: 2,
                 localIdentName: '[path]__[name]__[local]__[hash:base64:5]',
-                sourceMap: true
+                context: path.resolve(process.cwd(), 'src'),
+                sourceMap: true,
+                minimize: !isDev
               }
             },
             { loader: 'postcss-loader', options: { sourceMap: true } },
@@ -176,7 +196,7 @@ const webpackLoaders = () => {
       )
     },
     {
-      test: /\.(png|svg|jpg|gif)$/,
+      test: webpackIsomorphicToolsPlugin.regularExpression('images'),
       use: [
         {
           loader: 'url-loader',
@@ -187,7 +207,7 @@ const webpackLoaders = () => {
       ]
     },
     {
-      test: /\.(woff|woff2|eot|ttf|otf)$/,
+      test: webpackIsomorphicToolsPlugin.regularExpression('fonts'),
       use: [
         'file-loader'
       ]
@@ -206,7 +226,7 @@ const webpackLoaders = () => {
 };
 module.exports = {
   target: 'web',
-  devtool: isDev ? 'cheap-module-source-map' : 'hidden-source-map',
+  devtool: isDev ? 'cheap-module-source-map' : false,
   context: path.resolve(process.cwd()),
   cache: isDev,
   entry: getEntry(),

@@ -1,7 +1,7 @@
 import React from 'react';
 import { hydrate } from 'react-dom';
 import Loadable from 'react-loadable';
-import { AppContainer } from 'react-hot-loader';
+// import { AppContainer } from 'react-hot-loader';
 import { Router } from 'react-router-dom';
 import { Provider } from 'mobx-react';
 import { useStrict } from 'mobx';
@@ -14,24 +14,23 @@ const store = clientCreateStore();
 const browserHistory = createBrowserHistory();
 
 const dest = document.getElementById('root');
-const renderApp = () => {
+const renderApp = Component => {
   Loadable.preloadReady().then(() => {
     hydrate(
-      <AppContainer>
-        <Provider {...store}>
-          <Router history={browserHistory}>
-            <App />
-          </Router>
-        </Provider>
-      </AppContainer>,
+      <Provider {...store}>
+        <Router history={browserHistory}>
+          <Component />
+        </Router>
+      </Provider>,
       dest
     );
   });
 };
-renderApp();
+renderApp(App);
 
 if (module.hot) {
   module.hot.accept('./containers/app', () => {
-    renderApp();
+    const NextApp = require('./containers/app').default;
+    renderApp(NextApp);
   });
 }

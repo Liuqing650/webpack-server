@@ -1,20 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import _ from 'lodash/fp';
 import { toJS } from 'mobx';
 
-function prepareStore(allStore) {
-  const keyArr = Object.keys(allStore);
+function prepareStore(store) {
+  const keyArr = Object.keys(store);
   const output = {};
   keyArr.forEach(key => {
-    output[key] = toJS(allStore[key]);
+    output[key] = toJS(store[key]);
   });
   return output;
 }
 
 const Html = ({ assets, htmlContent, ...store }) => {
-  const envAssets = __DEV__
-    ? { main: { js: '/assets/main.js', css: '/assets/main.css' } }
-    : assets;
   return (
     <html lang={'en'}>
       <head>
@@ -27,17 +25,10 @@ const Html = ({ assets, htmlContent, ...store }) => {
         <title>webpack-server</title>
         <link rel="shortcut icon" href="/favicon.ico" />
 
-        {Object.keys(envAssets)
-          .map((key, index) =>
-            envAssets[key].css
-              ? < link
-                key = {`css-${index}`}
-                href={ envAssets[key].css }
-                media="screen, projection"
-                rel="stylesheet"
-                type="text/css"
-              /> : ''
-          )}
+          {/* styles (will be present only in production with webpack extract text plugin) */}
+          {Object.keys(assets.styles).map((style, i) =>
+            <link href={assets.styles[style]} key={`css-${i}`} media="screen, projection"
+                  rel="stylesheet" type="text/css"/>)}
       </head>
       <body>
         <div
@@ -52,8 +43,12 @@ const Html = ({ assets, htmlContent, ...store }) => {
               `window.__INITIAL_STATE__=${JSON.stringify(prepareStore(store))};`
           }}
         />
-        {Object.keys(envAssets)
-          .map((key, index) => <script key={`js-${index}`} src={envAssets[key].js}></script>)}
+        <script key={_.uniqueId()} src={assets.javascript.manifest} />
+        <script key={_.uniqueId()} src={assets.javascript.vendor} />
+        <script key={_.uniqueId()} src={assets.javascript.main} />
+        {/* {Object.keys(assets.javascript).map((script, i) =>
+            <script src={assets.javascript[script]} key={`js-${i}`}/>
+          )} */}
       </body>
     </html>
   );
@@ -62,6 +57,7 @@ const Html = ({ assets, htmlContent, ...store }) => {
 Html.defaultProps = { htmlContent: '' };
 Html.propTypes = {
   htmlContent: PropTypes.string,
+  assets: PropTypes.object,
   allStore: PropTypes.object // eslint-disable-line react/forbid-prop-types
 };
 export default Html;

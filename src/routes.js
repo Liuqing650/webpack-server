@@ -1,8 +1,9 @@
 import loadable from 'helpers/loadable';
+import HomePage from 'containers/homePage';
 
 // 按需加载
-const HomePage = loadable(() =>
-  import('./containers/homePage' /* webpackChunkName: 'HomePage' */));
+// const HomePage = loadable(() =>
+//   import('./containers/homePage' /* webpackChunkName: 'HomePage' */));
 
 const NextPage = loadable(() =>
   import('./containers/nextPage' /* webpackChunkName: 'NextPage' */));
