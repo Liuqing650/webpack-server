@@ -28,7 +28,7 @@ const getPlugins = () => {
   // Common
   const plugins = [
     new ExtractTextPlugin({
-      filename: isDev ? '[name].css' : '[name].[contenthash:8].css',
+      filename: '[name].[contenthash:8].css',
       allChunks: true,
       ignoreOrder: CSSModules,
       disable: isDev
@@ -39,17 +39,9 @@ const getPlugins = () => {
       'process.env.NODE_ENV': nodeEnv,
       __CLIENT__: true,
       __SERVER__: false,
-      __DEVELOPMENT__: true,
       __DEV__: isDev
     }),
     new webpack.NoEmitOnErrorsPlugin(),
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'vendor',
-      minChunks: Infinity
-    }),
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'manifest'
-    }),
     webpackIsomorphicToolsPlugin
   ];
 
@@ -65,6 +57,13 @@ const getPlugins = () => {
       new CleanWebpackPlugin([path.resolve(process.cwd(), 'public/assets')], { root: rootPath }),
       new webpack.HashedModuleIdsPlugin(),
       new MinifyPlugin({}, { test: /\.js?$/, comments: false }),
+      new webpack.optimize.CommonsChunkPlugin({
+        name: 'vendor',
+        minChunks: Infinity
+      }),
+      new webpack.optimize.CommonsChunkPlugin({
+        name: 'manifest'
+      }),
       new webpack.optimize.ModuleConcatenationPlugin()
     );
   }
@@ -225,13 +224,15 @@ const webpackLoaders = () => {
   return loaders;
 };
 module.exports = {
+  name: 'client',
   target: 'web',
-  devtool: isDev ? 'cheap-module-source-map' : false,
+  // devtool: isDev ? 'cheap-module-source-map' : false,
+  devtool: false,
   context: path.resolve(process.cwd()),
-  cache: isDev,
+  // cache: isDev,
   entry: getEntry(),
   output: {
-    path: path.resolve(process.cwd(), 'public/assets'),
+    path: path.resolve(process.cwd(), './public/assets'),
     filename: isDev ? '[name].js' : '[name].[chunkhash:8].js',
     chunkFilename: isDev ? '[name].chunk.js' : '[name].[chunkhash:8].chunk.js',
     publicPath: '/assets/',

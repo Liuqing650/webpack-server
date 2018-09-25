@@ -1,11 +1,12 @@
+import React from 'react';
 import Loadable from 'react-loadable';
 import LoadingCom from 'components/common/LoadingCom';
 
-const loadable = (Component) => {
+export default cmp => {
   return Loadable({
-    loader: Component,
-    loading: LoadingCom,
-
+    loader: cmp,
+    loading() {
+      return <LoadingCom />;
+    },
   });
 };
-export default loadable;

@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {  Route, Switch, Redirect, withRouter } from 'react-router-dom';
 import routers from '../../routes';
 
-class App extends Component {
+class App extends React.Component {
   componentDidMount() {
     console.log(5555)
   }

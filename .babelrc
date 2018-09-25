@@ -5,12 +5,13 @@
     "react",
     "stage-0"
   ],
+  "comments": true,
   "plugins": [
     "transform-runtime",
-    "react-loadable/babel",
-    "react-hot-loader/babel",
     "transform-decorators-legacy",
-    "syntax-dynamic-import"
+    "syntax-dynamic-import",
+    "react-loadable/babel",
+    "react-hot-loader/babel"
   ],
   "env": {
     "development": {

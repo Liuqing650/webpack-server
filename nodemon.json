@@ -1,0 +1,9 @@
+{
+  "watch": [
+    "bin/server.js",
+    "webpack/",
+    "src/server.js",
+    "src/stores/",
+    "src/helpers/Html.js"
+  ]
+}
