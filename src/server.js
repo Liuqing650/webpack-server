@@ -7,11 +7,8 @@ import Loadable from 'react-loadable';
 import { renderToString, renderToStaticMarkup } from 'react-dom/server';
 import chalk from 'chalk';
 import url from 'url';
-import { RouterStore } from 'mobx-react-router';
-import { RouterContext, match } from 'react-router';
 import { StaticRouter } from 'react-router-dom';
 import { Provider, useStaticRendering } from 'mobx-react';
-import { parseUrl } from 'query-string';
 import config from './config';
 import Html from './helpers/Html';
 import App from './containers/app';
@@ -19,7 +16,8 @@ import { serverCreateStore } from './stores';
 
 const renderHtml = (htmlContent, store) => {
   const assets = webpackIsomorphicTools.assets();
-  const html = renderToStaticMarkup(
+  console.log('stores------>', JSON.stringify(htmlContent));
+  const html = renderToString(
     <Html
       assets={assets}
       htmlContent={htmlContent}
@@ -36,24 +34,27 @@ const renderHtml = (htmlContent, store) => {
 // 默认服务端渲染函数
 const defaultSend = (req, resp, store) => {
   const context = {};
+  let modules = [];
   const htmlContent = (
     <Provider {...store}>
-        <StaticRouter location={req.url} context={context}>
+      <StaticRouter location={req.url} context={context}>
+        <Loadable.Capture report={moduleName => modules.push(moduleName)}>
           <App />
-        </StaticRouter>
+        </Loadable.Capture>
+      </StaticRouter>
     </Provider>
   );
   resp.status(200);
   global.navigator = { userAgent: req.headers['user-agent'] };
-  resp.send(renderHtml(renderToString(htmlContent), store));
+  resp.send(renderHtml(renderToStaticMarkup(htmlContent), store));
 };
-
+// ----------------------------------------------
 useStaticRendering(true);
 const app = new express();
 app.use(hpp());
 // app.use(compression());
 
-app.use(express.static(path.resolve(process.cwd(), 'public/dist')));
+app.use(express.static(path.resolve(process.cwd(), './public')));
 if (__DEV__) {
   /* Run express as webpack dev server */
   const webpack = require('webpack');
@@ -82,8 +83,8 @@ app.get('*', (req, resp) => {
   if(__DEV__) {
     webpackIsomorphicTools.refresh();
   }
-  /*服务端注入RouterStore*/
   const stores = serverCreateStore();
+  console.log('stores------>', JSON.stringify(stores.clientStore));
   stores.clientStore.env = __DEV__ ? 'dev' : 'prod';
   defaultSend(req, resp, stores);
 })

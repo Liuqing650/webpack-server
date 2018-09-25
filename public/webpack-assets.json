@@ -1,7 +1,8 @@
 {
   "javascript": {
     "NextPage": "/assets/NextPage.chunk.js",
-    "main": "/assets/main.js"
+    "main": "/assets/main.js",
+    "manifest": "/assets/manifest.js"
   },
   "styles": {},
   "assets": {

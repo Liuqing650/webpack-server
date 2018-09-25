@@ -2,7 +2,7 @@ import { observable, action, extendObservable } from 'mobx';
 
 class ClientStore {
   @observable title = 'hello mobx';
-  @observable info = 'nothing1';
+  @observable info = 'nothing2';
   @observable env = '';
 
   constructor(initialState) {

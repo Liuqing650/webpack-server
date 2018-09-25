@@ -43,6 +43,13 @@ const getPlugins = () => {
       __DEV__: isDev
     }),
     new webpack.NoEmitOnErrorsPlugin(),
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'vendor',
+      minChunks: Infinity
+    }),
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'manifest'
+    }),
     webpackIsomorphicToolsPlugin
   ];
 
@@ -58,14 +65,7 @@ const getPlugins = () => {
       new CleanWebpackPlugin([path.resolve(process.cwd(), 'public/assets')], { root: rootPath }),
       new webpack.HashedModuleIdsPlugin(),
       new MinifyPlugin({}, { test: /\.js?$/, comments: false }),
-      new webpack.optimize.ModuleConcatenationPlugin(),
-      new webpack.optimize.CommonsChunkPlugin({
-        name: 'vendor',
-        minChunks: Infinity
-      }),
-      new webpack.optimize.CommonsChunkPlugin({
-        name: 'manifest'
-      })
+      new webpack.optimize.ModuleConcatenationPlugin()
     );
   }
   return plugins;
@@ -238,7 +238,7 @@ module.exports = {
     pathinfo: isDev
   },
   resolve: {
-    modules: ['src', 'node_modules'],
+    modules: [path.resolve(process.cwd(), 'src'), 'node_modules'],
     descriptionFiles: ['package.json'],
     extensions: ['.js', '.jsx', '.json']
   },

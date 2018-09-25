@@ -1,5 +1,5 @@
 import React from 'react';
-import { hydrate } from 'react-dom';
+import ReactDOM from 'react-dom';
 import Loadable from 'react-loadable';
 // import { AppContainer } from 'react-hot-loader';
 import { Router } from 'react-router-dom';
@@ -13,24 +13,23 @@ useStrict(true);
 const store = clientCreateStore();
 const browserHistory = createBrowserHistory();
 
-const dest = document.getElementById('root');
 const renderApp = Component => {
   Loadable.preloadReady().then(() => {
-    hydrate(
+    ReactDOM.hydrate(
       <Provider {...store}>
         <Router history={browserHistory}>
           <Component />
         </Router>
       </Provider>,
-      dest
+      document.getElementById('root')
     );
   });
 };
 renderApp(App);
 
-if (module.hot) {
-  module.hot.accept('./containers/app', () => {
-    const NextApp = require('./containers/app').default;
-    renderApp(NextApp);
-  });
-}
+// if (module.hot) {
+//   module.hot.accept('./containers/app', () => {
+//     const NextApp = require('./containers/app').default;
+//     renderApp(NextApp);
+//   });
+// }

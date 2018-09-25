@@ -1,13 +1,10 @@
-import React from 'react';
 import Loadable from 'react-loadable';
 import LoadingCom from 'components/common/LoadingCom';
 
-const loadable = (component) => {
+const loadable = (Component) => {
   return Loadable({
-    loader: component,
-    loading() {
-      return <LoadingCom />;
-    },
+    loader: Component,
+    loading: LoadingCom,
 
   });
 };

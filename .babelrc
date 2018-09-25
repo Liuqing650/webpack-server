@@ -7,10 +7,10 @@
   ],
   "plugins": [
     "transform-runtime",
-    "transform-decorators-legacy",
-    "syntax-dynamic-import",
     "react-loadable/babel",
-    "react-hot-loader/babel"
+    "react-hot-loader/babel",
+    "transform-decorators-legacy",
+    "syntax-dynamic-import"
   ],
   "env": {
     "development": {
