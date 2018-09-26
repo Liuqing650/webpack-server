@@ -1,9 +1,11 @@
 {
+  "verbose": true,
+  "ignore": [
+    "node_modules"
+  ],
   "watch": [
-    "bin/server.js",
-    "webpack/",
     "src/server.js",
-    "src/stores/",
-    "src/helpers/Html.js"
+    "webpack/",
+    "bin/server.js"
   ]
 }

@@ -25,7 +25,7 @@ export default class HomePage extends Component {
         <h2>New Page</h2>
         <h4>{clientStore.title}: {clientStore.info}</h4>
         <h4>{clientStore.env || '没得信息'}</h4>
-        <button onClick={this.getInfo}>获取Store1信息</button>
+        <button onClick={this.getInfo}>获取Store信息</button>
         <button onClick={this.changePage}>跳转</button>
       </div>
     );

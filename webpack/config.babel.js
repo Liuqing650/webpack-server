@@ -48,6 +48,7 @@ const getPlugins = () => {
   if (isDev) {
     plugins.push(
       new webpack.HotModuleReplacementPlugin(),
+      new webpack.NoEmitOnErrorsPlugin(),
       new webpack.NamedModulesPlugin(),
       new FriendlyErrorsWebpackPlugin(),
       new webpack.IgnorePlugin(/webpack-assets\.json$/)
@@ -228,11 +229,11 @@ module.exports = {
   target: 'web',
   // devtool: isDev ? 'cheap-module-source-map' : false,
   devtool: false,
-  context: path.resolve(process.cwd()),
+  context: path.join(process.cwd()),
   // cache: isDev,
   entry: getEntry(),
   output: {
-    path: path.resolve(process.cwd(), './public/assets'),
+    path: path.join(process.cwd(), './public/assets'),
     filename: isDev ? '[name].js' : '[name].[chunkhash:8].js',
     chunkFilename: isDev ? '[name].chunk.js' : '[name].[chunkhash:8].chunk.js',
     publicPath: '/assets/',

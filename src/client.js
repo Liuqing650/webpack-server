@@ -1,8 +1,8 @@
 import 'core-js/es6/map';
 import 'core-js/es6/set';
 import React from 'react';
-import { hydrate } from 'react-dom';
-import { Router } from 'react-router-dom';
+import ReactDOM from 'react-dom';
+import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'mobx-react';
 import Loadable from 'react-loadable';
 import { AppContainer } from 'react-hot-loader';
@@ -15,17 +15,19 @@ import App from './containers/app';
 const store = clientCreateStore();
 const browserHistory = createBrowserHistory();
 
+const target = document.getElementById('root');
 const renderApp = Component => {
   Loadable.preloadReady().then(() => {
-    hydrate(
+    console.log('dom-len---2->', target.innerHTML.trim().length);
+    ReactDOM.hydrate(
       <Provider {...store}>
-        <Router history={browserHistory}>
+        <BrowserRouter>
           <AppContainer>
             <Component />
           </AppContainer>
-        </Router>
+        </BrowserRouter>
       </Provider>,
-      document.getElementById('root')
+      target
     );
   });
 };

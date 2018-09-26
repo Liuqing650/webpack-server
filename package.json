@@ -16,7 +16,10 @@
     "start": "better-npm-run start-dev",
     "build": "better-npm-run build",
     "start_prod": "concurrently --kill-others \"better-npm-run start-prod\"",
-    "stop_prod": "pm2 delete webpack_server_prod"
+    "stop_prod": "pm2 delete webpack_server_prod",
+    "preview": "concurrently --kill-others \"better-npm-run start-preview\"",
+    "stop_p": "pm2 delete webpack_server_preview",
+    "postinstall": "npm run build"
   },
   "betterScripts": {
     "start-dev": {
@@ -40,7 +43,16 @@
         "NODE_PATH": "./src",
         "NODE_ENV": "production",
         "HOST": "127.0.0.1",
-        "PORT": 6000
+        "PORT": 3000
+      }
+    },
+    "start-preview": {
+      "command": "pm2 start ./bin/server.js --name=webpack_server_preview",
+      "env": {
+        "NODE_PATH": "./src",
+        "NODE_ENV": "production",
+        "HOST": "127.0.0.1",
+        "PORT": 3000
       }
     }
   },
@@ -80,6 +92,7 @@
     "babel-plugin-syntax-dynamic-import": "^6.18.0",
     "babel-plugin-transform-decorators-legacy": "^1.3.4",
     "babel-plugin-transform-regenerator": "^6.26.0",
+    "babel-plugin-transform-remove-console": "^6.9.4",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.6.1",
@@ -92,6 +105,7 @@
     "chalk": "^2.3.2",
     "clean-webpack-plugin": "^0.1.19",
     "concurrently": "^3.5.1",
+    "connect-history-api-fallback": "^1.5.0",
     "cookie-parser": "^1.4.3",
     "css-loader": "^0.28.10",
     "express": "^4.16.3",
@@ -111,6 +125,7 @@
     "react-helmet": "^5.2.0",
     "react-transform-catch-errors": "^1.0.2",
     "redbox-react": "^1.5.0",
+    "serialize-javascript": "^1.5.0",
     "style-loader": "^0.20.3",
     "stylelint": "^9.5.0",
     "stylelint-webpack-plugin": "^0.10.5",

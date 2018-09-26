@@ -2,18 +2,18 @@ import { observable, action, extendObservable } from 'mobx';
 
 class ClientStore {
   @observable title = 'hello mobx';
-  @observable info = 'nothin22';
+  @observable info = 'nothing';
   @observable env = '';
 
   constructor(initialState) {
+    // 服务端初始化数据
     if (initialState) {
-      console.log('initialState----->', initialState);
       extendObservable(this, initialState.clientStore);
     }
   }
 
   @action.bound getInfo() {
-    this.info = 'success!';
+    this.info = 'success222!';
   }
 }
 

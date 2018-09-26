@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash/fp';
+import serialize from "serialize-javascript"
 import { toJS } from 'mobx';
 
 function prepareStore(store) {
@@ -14,7 +15,7 @@ function prepareStore(store) {
 
 const Html = ({ assets, htmlContent, ...store }) => {
   return (
-    <html lang={'en'}>
+    <html lang="en">
       <head>
         <meta charSet="utf-8" />
         <meta httpEquiv="x-ua-compatible" content="ie=edge" />
@@ -24,11 +25,15 @@ const Html = ({ assets, htmlContent, ...store }) => {
         />
         <title>webpack-server</title>
         <link rel="shortcut icon" href="/favicon.ico" />
-
-          {/* styles (will be present only in production with webpack extract text plugin) */}
-          {Object.keys(assets.styles).map((style, i) =>
-            <link href={assets.styles[style]} key={`css-${i}`} media="screen, projection"
-                  rel="stylesheet" type="text/css"/>)}
+          {_.keys(assets.styles).map(style => (
+            <link
+              key={_.uniqueId()}
+              href={assets.styles[style]}
+              media="screen, projection"
+              rel="stylesheet"
+              type="text/css"
+            />
+          ))}
       </head>
       <body>
         <div
@@ -40,12 +45,12 @@ const Html = ({ assets, htmlContent, ...store }) => {
           dangerouslySetInnerHTML={{
             __html:
               store &&
-              `window.__INITIAL_STATE__=${JSON.stringify(prepareStore(store))};`
+              `window.__INITIAL_STATE__=${serialize(prepareStore(store))};`
           }}
         />
         <script key={_.uniqueId()} src={assets.javascript.manifest} />
         <script key={_.uniqueId()} src={assets.javascript.vendor} />
-        <script key={_.uniqueId()} src={assets.javascript.main} />
+        <script id="mainJs" key={_.uniqueId()} src={assets.javascript.main} />
         {/* {Object.keys(assets.javascript).map((script, i) =>
             <script src={assets.javascript[script]} key={`js-${i}`}/>
           )} */}
