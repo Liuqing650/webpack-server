@@ -15,5 +15,6 @@
 **编译项目**： `npm run build`
 
 > 环境部署工具为 `pm2`
+
 **发布项目**： `npm run start_prod`
 **杀掉进程**： `npm run stop_prod`
