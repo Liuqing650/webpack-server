@@ -1,0 +1,11 @@
+{
+  "verbose": true,
+  "ignore": [
+    "node_modules"
+  ],
+  "watch": [
+    "src/server.js",
+    "webpack/",
+    "bin/server.js"
+  ]
+}

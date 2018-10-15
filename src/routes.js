@@ -1,17 +1,24 @@
-import React from 'react';
-import { Route, IndexRoute, Redirect } from 'react-router';
-import {
-  App,
-  HomePage,
-  NextPage
-} from 'containers';
+import loadable from 'helpers/loadable';
+import HomePage from 'containers/homePage';
 
-export default (allStores) => {
-  return (
-    <Route path="/" component={App}>
-      <IndexRoute component={HomePage} />
-      <Route path="new" component={NextPage} />
-      <Redirect from="*" to="/" />
-    </Route>
-  );
-};
+// 按需加载
+// const HomePage = loadable(() =>
+//   import('./containers/homePage' /* webpackChunkName: 'HomePage' */));
+
+const NextPage = loadable(() =>
+  import('./containers/nextPage' /* webpackChunkName: 'NextPage' */));
+
+
+const routers = [
+  {
+    path: '/',
+    exact: true,
+    component: HomePage,
+  },
+  {
+    path: '/next',
+    component: NextPage,
+  }
+];
+
+export default routers;

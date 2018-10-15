@@ -1,18 +1,16 @@
 #!/usr/bin/env node
-require('../server.babel'); // babel registration (runtime transpilation for node)
-const path = require('path');
-const rootDir = path.resolve(__dirname, '..');
-/**
- * Define isomorphic constants.
- */
+require('babel-polyfill');
+require('babel-register')({
+    "plugins": [
+        "dynamic-import-node"
+    ]
+});
+const WebpackIsomorphicTools = require('webpack-isomorphic-tools');
+
 global.__CLIENT__ = false;
 global.__SERVER__ = true;
-global.__DISABLE_SSR__ = false;  // <----- DISABLES SERVER SIDE RENDERING FOR ERROR DEBUGGING
-global.__DEVELOPMENT__ = process.env.NODE_ENV !== 'production';
+global.__DEV__ = process.env.NODE_ENV === 'development';
 
-// https://github.com/halt-hammerzeit/webpack-isomorphic-tools
-let WebpackIsomorphicToolsPlugin = require('webpack-isomorphic-tools');
-global.webpackIsomorphicToolsPlugin = new WebpackIsomorphicToolsPlugin(require('../webpack/webpack-isomorphic-tools'))
-  .server(rootDir, function () {
-    require('../src/server');
-  });
+const dirRoot = require('path').join(process.cwd());
+// Run server
+global.webpackIsomorphicTools = new WebpackIsomorphicTools(require('../webpack/webpack-isomorphic-tools.js')).server(dirRoot, () => require('../src/server'));

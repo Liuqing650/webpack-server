@@ -1,21 +1,40 @@
+import 'core-js/es6/map';
+import 'core-js/es6/set';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Router, browserHistory } from 'react-router';
-import getRoutes from './routes';
+import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'mobx-react';
-import combineServerData from 'helpers/combineServer';
-import * as allStores from 'stores';
-import { RouterStore, syncHistoryWithStore } from 'mobx-react-router';
+import Loadable from 'react-loadable';
+import { AppContainer } from 'react-hot-loader';
+// import { useStrict } from 'mobx';
+import { createBrowserHistory } from 'history';
+import { clientCreateStore } from './stores';
+import App from './containers/app';
 
-const routingStore = new RouterStore();
-combineServerData(allStores, window.__data);
-const history = syncHistoryWithStore(browserHistory, routingStore);
-const dest = document.getElementById('root');
+// useStrict(true);
+const store = clientCreateStore();
+const browserHistory = createBrowserHistory();
 
-allStores.routing = routingStore;
-ReactDOM.hydrate(
-  <Provider { ...allStores }>
-    <Router routes={getRoutes(allStores)} history={history} />
-  </Provider>,
-  dest
-);
+const target = document.getElementById('root');
+const renderApp = Component => {
+  Loadable.preloadReady().then(() => {
+    ReactDOM.hydrate(
+      <AppContainer>
+        <Provider {...store}>
+          <BrowserRouter>
+            <Component />
+          </BrowserRouter>
+        </Provider>
+      </AppContainer>,
+      target
+    );
+  });
+};
+renderApp(App);
+
+if (module.hot) {
+  module.hot.accept('./containers/app', () => {
+    const NextApp = require('./containers/app').default;
+    renderApp(NextApp);
+  });
+}

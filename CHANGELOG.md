@@ -1,6 +1,9 @@
 
 > The latest CHANGELOG is written in https://github.com/Liuqing650/webpack-server/releases .
 
+## `0.0.6`
+- 自动后缀 `autoprefixer`
+
 ## `0.0.5`
 - 浅实现服务端渲染
 - 分离 `@0.0.4` 版本到 `mobx` 分支, 后续接着 `mobx` 搭建非服务端项目
