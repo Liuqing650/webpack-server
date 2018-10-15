@@ -2,7 +2,6 @@ import path from 'path';
 // 获取页面访问时间
 import morgan from 'morgan';
 import express from 'express';
-import http from 'http';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
 // import history from 'connect-history-api-fallback';
@@ -54,7 +53,6 @@ const defaultSend = (req, resp, store) => {
 };
 useStaticRendering(true);
 const app = new express();
-const router = express.Router();
 app.use(hpp());
 app.use(cookieParser());
 app.use(bodyParser.json());
@@ -79,14 +77,14 @@ if (__DEV__) {
     noInfo: true,
     stats: 'minimal',
     serverSideRender: true,
-    headers: { 'Access-Control-Allow-Origin': '*' }
+    // headers: { 'Access-Control-Allow-Origin': '*' }
   }
   app.use(webpackDevMiddleware(compiler, serverOption));
   app.use(webpackHotMiddleware(compiler));
   // ssrHotServer();
-  require("babel-register")({
+  require('babel-register')({
     extensions: ['.js', '.jsx'],
-    plugins: ["ignore-html-and-css-imports"],
+    plugins: ['ignore-html-and-css-imports', 'dynamic-import-node'],
     cache: false
   });
   require('./utils/hot-node-module-replacement.js')({

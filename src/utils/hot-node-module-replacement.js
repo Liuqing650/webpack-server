@@ -7,6 +7,7 @@ const loadedExportFuns = {};
 const fileWatchers = {};
 let options = {};
 const oldExtFuns = {};
+const REStores = /^(?:.*[\\\/])?stores(?:[\\\/].*)?$/;
 const RENodeModule = /^(?:.*[\\\/])?node_modules(?:[\\\/].*)?$/;
 
 function setOptions(opts) {
@@ -33,7 +34,7 @@ function match(filename, ext, matchFn, ignoreNodeModules) {
   if (ext.indexOf(path.extname(filename)) === -1) return false;
 
   const fullname = path.resolve(filename);
-  if (ignoreNodeModules && RENodeModule.test(fullname)) return false;
+  if (ignoreNodeModules && (RENodeModule.test(fullname) || !REStores.test(fullname))) return false;
   if (matchFn && typeof matchFn === 'function') return !!matchFn(fullname);
   return true;
 }
@@ -72,6 +73,7 @@ function registerExtension(ext) {
   require.extensions[ext] = function (m, filename) {
     oldExtFun(m, filename);
     if (match(filename, ext, matchFn, ignoreNodeModules)) {
+      console.log('filename------->', filename);
       delete require.cache[filename];
       if (!loadedModules[filename]) {
         loadedModules[filename] = m;
