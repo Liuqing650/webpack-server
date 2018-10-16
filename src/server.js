@@ -75,20 +75,23 @@ if (__DEV__) {
     hot: true,
     overlay: true,
     noInfo: true,
-    stats: 'minimal',
+    // stats: 'minimal',
+    stats: 'none',
     serverSideRender: true,
     // headers: { 'Access-Control-Allow-Origin': '*' }
   }
   app.use(webpackDevMiddleware(compiler, serverOption));
   app.use(webpackHotMiddleware(compiler));
   // ssrHotServer();
+  const storesDir = path.join(process.cwd(), 'src/stores/');
   require('babel-register')({
     extensions: ['.js', '.jsx'],
     plugins: ['ignore-html-and-css-imports', 'dynamic-import-node'],
     cache: false
   });
   require('./utils/hot-node-module-replacement.js')({
-    extenstions: ['.js', '.jsx']
+    extenstions: ['.js', '.jsx'],
+    directories: [storesDir],
   });
 }
 app.get('*', (req, resp) => {
