@@ -2,6 +2,7 @@ import path from 'path';
 // 获取页面访问时间
 import morgan from 'morgan';
 import express from 'express';
+import http from 'http';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
 // import history from 'connect-history-api-fallback';
@@ -19,10 +20,12 @@ import url from 'url';
 import { StaticRouter } from 'react-router';
 import { toJS } from 'mobx';
 import { Provider, useStaticRendering } from 'mobx-react';
-import config from './config';
 import Html from './helpers/Html';
-// import { serverCreateStore } from 'stores';
+import ssrHotServer from './utils/ssr-hot-server';
 import App from './containers/app';
+import config from './config';
+// 热替换服务端时不能import, 否则将失效
+// import { serverCreateStore } from 'stores';
 
 const renderHtml = (htmlContent, store) => {
   const assets = webpackIsomorphicTools.assets();
@@ -51,8 +54,17 @@ const defaultSend = (req, resp, store) => {
   global.navigator = { userAgent: req.headers['user-agent'] };
   resp.send(renderHtml(renderToString(htmlContent), store));
 };
+
+// require stores
+const requireStores = () => {
+  const { serverCreateStore } = require('./stores');
+  return serverCreateStore();
+};
+
 useStaticRendering(true);
 const app = new express();
+const router = express.Router();
+let stores = __DEV__ ? null : requireStores();
 app.use(hpp());
 app.use(cookieParser());
 app.use(bodyParser.json());
@@ -77,26 +89,19 @@ if (__DEV__) {
     noInfo: true,
     stats: 'minimal',
     serverSideRender: true,
-    // headers: { 'Access-Control-Allow-Origin': '*' }
+    headers: { 'Access-Control-Allow-Origin': '*' }
   }
   app.use(webpackDevMiddleware(compiler, serverOption));
   app.use(webpackHotMiddleware(compiler));
-  // ssrHotServer();
-  require('babel-register')({
-    extensions: ['.js', '.jsx'],
-    plugins: ['ignore-html-and-css-imports', 'dynamic-import-node'],
-    cache: false
-  });
-  require('./utils/hot-node-module-replacement.js')({
-    extenstions: ['.js', '.jsx']
-  });
+  const storePath = path.resolve(process.cwd(), 'src/stores/');
+  ssrHotServer(storePath);
 }
 app.get('*', (req, resp) => {
   if(__DEV__) {
     webpackIsomorphicTools.refresh();
+    const { serverCreateStore } = require('./stores');
+    stores = serverCreateStore();
   }
-  const { serverCreateStore } = require('./stores');
-  const stores = serverCreateStore();
   stores.clientStore.env = __DEV__ ? 'dev' : 'prod';
   defaultSend(req, resp, stores);
 });
